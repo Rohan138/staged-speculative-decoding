@@ -1,5 +1,13 @@
 from setuptools import find_packages, setup
 
+requirements = []
+with open("requirements.txt") as f:
+    for line in f:
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        requirements.append(line)
+
 setup(
     name="staged-speculative-decoding",
     packages=find_packages(exclude=[]),
@@ -16,10 +24,7 @@ setup(
         "transformers",
         "speculative decoding",
     ],
-    install_requires=[
-        "einops>=0.6.1",
-        "torch>=2.0.0",
-    ],
+    install_requires=requirements,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

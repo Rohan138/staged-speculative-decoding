@@ -8,9 +8,6 @@ Implementation of [Staged Speculative Decoding](https://arxiv.org/abs/2308.04623
 git clone https://github.com/Rohan138/staged-speculative-decoding.git
 pip install -e .
 
-# Make sure to run this! See https://github.com/pytorch/pytorch/pull/114083/files
-bash fix_torch.sh
-
 # See main.py for additional arguments
 python main.py --wandb
 ```
