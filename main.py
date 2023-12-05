@@ -18,7 +18,7 @@ def parse_args():
     parser.add_argument("--draft-model", type=str)
     parser.add_argument("--dtype", type=str)
     parser.add_argument("--temperature", type=float)
-    parser.add_argument("--num-samples", type=int, default=10)
+    parser.add_argument("--num-samples", type=int, default=100)
 
     args = parser.parse_args()
 
@@ -60,19 +60,18 @@ def run_prediction_loop(
         inputs = inputs.to(model.device)
 
         if temperature is not None:
-            do_sample = True
+            kwargs = {"temperature": temperature, "do_sample": True}
         else:
-            do_sample = False
+            kwargs = {"do_sample": False}
 
         start = time.time()
         with torch.no_grad():
             gen_out = model.generate(
                 **inputs,
-                do_sample=do_sample,
-                temperature=temperature,
                 max_new_tokens=GEN_LEN,
                 pad_token_id=model.generation_config.eos_token_id,
                 assistant_model=assistant_model,
+                **kwargs,
             )
         end = time.time()
 
