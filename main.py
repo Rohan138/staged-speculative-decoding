@@ -79,8 +79,8 @@ def run_prediction_loop(
         gen_time.append(end - start)
         num_tokens.append(gen_out.shape[1] - inputs.input_ids.shape[1])
 
-    print(f"Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
-    print(f"Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
+    avg_time = sum(gen_time) / sum(num_tokens) * 1000
+    return avg_time
 
 
 def print_model_info(model):
@@ -114,10 +114,14 @@ def main():
     )
     print_model_info(draft_model)
 
-    run_prediction_loop(model, tokenizer, args.num_samples, args.temperature)
-    run_prediction_loop(
+    orig_time = run_prediction_loop(
+        model, tokenizer, args.num_samples, args.temperature
+    )
+    spec_time = run_prediction_loop(
         model, tokenizer, args.num_samples, args.temperature, draft_model
     )
+    print(f"Time per token (ms): Original: {orig_time:.3f}, Speculative: {spec_time:.3f}")
+    print(f"Speedup: {orig_time / spec_time:.3f}")
 
 
 if __name__ == "__main__":
