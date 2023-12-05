@@ -11,14 +11,13 @@ GEN_LEN = 128
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Run the benchmark, comparing the original to the new generation."
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str)
     parser.add_argument("--draft-model", type=str)
     parser.add_argument("--dtype", type=str)
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--num-samples", type=int, default=100)
+    parser.add_argument("--device-map", type=str, default="auto")
 
     args = parser.parse_args()
 
@@ -101,7 +100,7 @@ def main():
         torch_dtype=args.dtype,
         load_in_8bit=args.load_in_8bit,
         load_in_4bit=args.load_in_4bit,
-        device_map="auto",
+        device_map=args.device_map,
     )
     print_model_info(model)
 
@@ -110,7 +109,7 @@ def main():
         torch_dtype=args.dtype,
         load_in_8bit=args.load_in_8bit,
         load_in_4bit=args.load_in_4bit,
-        device_map="auto",
+        device_map=args.device_map,
     )
     print_model_info(draft_model)
 
