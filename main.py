@@ -112,18 +112,19 @@ def main():
         decoding=speculative_decoding,
         draft_model=draft_model,
     )
-    ssd_time = generate(
-        model,
-        tokenizer,
-        dataset,
-        args.batch_size,
-        args.temperature,
-        decoding=staged_speculative_decoding,
-        draft_model=draft_model,
-    )
+    # ssd_time = generate(
+    #     model,
+    #     tokenizer,
+    #     dataset,
+    #     args.batch_size,
+    #     args.temperature,
+    #     decoding=staged_speculative_decoding,
+    #     draft_model=draft_model,
+    # )
+    ssd_time = 0
     print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
     print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
-    print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
+    # print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
 
 
 if __name__ == "__main__":
