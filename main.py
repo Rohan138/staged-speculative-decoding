@@ -20,7 +20,6 @@ def parse_args():
     parser.add_argument("--dtype", type=str)
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--num-samples", type=int, default=100)
-    parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--device-map", type=str, default="auto")
 
     args = parser.parse_args()
@@ -99,7 +98,6 @@ def main():
         model,
         tokenizer,
         dataset,
-        args.batch_size,
         args.temperature,
         decoding=autoregressive_decoding,
     )
@@ -107,24 +105,21 @@ def main():
         model,
         tokenizer,
         dataset,
-        args.batch_size,
         args.temperature,
         decoding=speculative_decoding,
         draft_model=draft_model,
     )
-    # ssd_time = generate(
-    #     model,
-    #     tokenizer,
-    #     dataset,
-    #     args.batch_size,
-    #     args.temperature,
-    #     decoding=staged_speculative_decoding,
-    #     draft_model=draft_model,
-    # )
-    ssd_time = 0
+    ssd_time = generate(
+        model,
+        tokenizer,
+        dataset,
+        args.temperature,
+        decoding=staged_speculative_decoding,
+        draft_model=draft_model,
+    )
     print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
     print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
-    # print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
+    print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
 
 
 if __name__ == "__main__":
