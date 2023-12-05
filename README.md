@@ -61,13 +61,13 @@ url={https://openreview.net/forum?id=RKHF3VYjLK}
 }
 ```
 
-```bibtex
-@misc{medusa,
-    author     = {Tianle Cai and Yuhong Li and Zhengyang Geng and Hongwu Peng and Tri Dao},
-    title      = {Medusa: Simple Framework for Accelerating LLM Generation with Multiple Decoding Heads},
-    year       = {2023},
-    publisher  = {GitHub},
-    journal    = {GitHub repository},
-    howpublished = {\url{https://github.com/FasterDecoding/Medusa}},
+```
+@misc {gante2023assisted,
+    author       = { {Joao Gante} },
+    title        = { Assisted Generation: a new direction toward low-latency text generation },
+    year         = 2023,
+    url          = { https://huggingface.co/blog/assisted-generation },
+    doi          = { 10.57967/hf/0638 },
+    publisher    = { Hugging Face Blog }
 }
 ```
