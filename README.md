@@ -6,28 +6,23 @@ Implementation of [Staged Speculative Decoding](https://arxiv.org/abs/2308.04623
 ## Instructions
 ```
 git clone https://github.com/Rohan138/staged-speculative-decoding.git
-pip install -e .
+pip install -r requirements.txt
 
 # See main.py for additional arguments
-python main.py --wandb
+python main.py --model gpt2-xl --draft-model distilgpt2 --dtype "float16" --num-samples 100
 ```
 
 ## Changelog
 - 11/23/2023: Initial commit
 
 ## TODO
-- [ ] Choose and train draft and main models
-- [ ] Benchmark autoregressive decoding from both models
-- [ ] Implement and benchmark naive speculative decoding
-- [ ] Add and benchmark trigram model
+- [x] Choose and train draft and main models
+- [x] Benchmark autoregressive decoding
+- [x] Implement and benchmark naive speculative decoding
 - [ ] Add tree-structured batches
-- [ ] Benchmark against Medusa
 - [ ] Add WanDB logging
-- [ ] Add LLMPerf integration
 
 ## Acknowledgements
-
-Initial implementation borrowed from [lucidrains/speculative-decoding](https://github.com/lucidrains/speculative-decoding)
 
 ```bibtex
 @inproceedings{

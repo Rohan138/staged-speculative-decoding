@@ -1,22 +1,26 @@
 import argparse
-import time
 
 import torch
-from datasets import load_dataset
-from tqdm import tqdm
+from datasets import Dataset, load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-INPUT_LEN = 256
-GEN_LEN = 128
+from decoding import (
+    autoregressive_decoding,
+    generate,
+    speculative_decoding,
+    staged_speculative_decoding,
+)
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="c4")
     parser.add_argument("--model", type=str)
     parser.add_argument("--draft-model", type=str)
     parser.add_argument("--dtype", type=str)
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--num-samples", type=int, default=100)
+    parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--device-map", type=str, default="auto")
 
     args = parser.parse_args()
@@ -40,46 +44,19 @@ def parse_args():
     return args
 
 
-def run_prediction_loop(
-    model, tokenizer, num_samples, temperature=None, assistant_model=None
-):
-    outputs = []
-    gen_time = []
-    num_tokens = []
-    ds = load_dataset("bigcode/the-stack-smol", data_dir="data/python", split="train")
-    ds_iterator = iter(ds)
-
-    desc = "original model" if assistant_model is None else f"speculative model"
-    pbar = tqdm(range(num_samples), desc)
-    for _ in pbar:
-        next_data = next(ds_iterator)["content"]
-        inputs = tokenizer(
-            [next_data], return_tensors="pt", max_length=INPUT_LEN, truncation=True
+def get_dataset(dataset_name: str, num_samples: int):
+    if "c4" in dataset_name:
+        dataset = load_dataset(dataset_name, "en", split="validation", streaming=True)
+        dataset = dataset.take(num_samples)
+        dataset = Dataset.from_generator(lambda: dataset)
+        return dataset["text"]
+    elif "stack" in dataset_name:
+        dataset = load_dataset(
+            dataset_name, data_dir="data/python", split=f"train[:{num_samples}]"
         )
-        inputs = inputs.to(model.device)
-
-        if temperature is not None:
-            kwargs = {"temperature": temperature, "do_sample": True}
-        else:
-            kwargs = {"do_sample": False}
-
-        start = time.time()
-        with torch.no_grad():
-            gen_out = model.generate(
-                **inputs,
-                max_new_tokens=GEN_LEN,
-                pad_token_id=model.generation_config.eos_token_id,
-                assistant_model=assistant_model,
-                **kwargs,
-            )
-        end = time.time()
-
-        outputs.append(tokenizer.decode(gen_out[0]))
-        gen_time.append(end - start)
-        num_tokens.append(gen_out.shape[1] - inputs.input_ids.shape[1])
-
-    avg_time = sum(gen_time) / sum(num_tokens) * 1000
-    return avg_time
+        return dataset["content"]
+    else:
+        raise NotImplementedError
 
 
 def print_model_info(model):
@@ -94,6 +71,8 @@ def main():
 
     # Instantiate the tokenizer, model, and draft model
     tokenizer = AutoTokenizer.from_pretrained(args.model)
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "left"
 
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
@@ -113,14 +92,38 @@ def main():
     )
     print_model_info(draft_model)
 
-    orig_time = run_prediction_loop(
-        model, tokenizer, args.num_samples, args.temperature
+    # Load the dataset
+    dataset = get_dataset(args.dataset, args.num_samples)
+
+    ard_time = generate(
+        model,
+        tokenizer,
+        dataset,
+        args.batch_size,
+        args.temperature,
+        decoding=autoregressive_decoding,
     )
-    spec_time = run_prediction_loop(
-        model, tokenizer, args.num_samples, args.temperature, draft_model
+    spd_time = generate(
+        model,
+        tokenizer,
+        dataset,
+        args.batch_size,
+        args.temperature,
+        decoding=speculative_decoding,
+        draft_model=draft_model,
     )
-    print(f"Time per token (ms): Original: {orig_time:.3f}, Speculative: {spec_time:.3f}")
-    print(f"Speedup: {orig_time / spec_time:.3f}")
+    ssd_time = generate(
+        model,
+        tokenizer,
+        dataset,
+        args.batch_size,
+        args.temperature,
+        decoding=staged_speculative_decoding,
+        draft_model=draft_model,
+    )
+    print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
+    print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
+    print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
 
 
 if __name__ == "__main__":
