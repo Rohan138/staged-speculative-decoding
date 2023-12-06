@@ -94,21 +94,21 @@ def main():
     # Load the dataset
     dataset = get_dataset(args.dataset, args.num_samples)
 
-    ard_time = generate(
-        model,
-        tokenizer,
-        dataset,
-        args.temperature,
-        decoding=autoregressive_decoding,
-    )
-    spd_time = generate(
-        model,
-        tokenizer,
-        dataset,
-        args.temperature,
-        decoding=speculative_decoding,
-        draft_model=draft_model,
-    )
+    # ard_time = generate(
+    #     model,
+    #     tokenizer,
+    #     dataset,
+    #     args.temperature,
+    #     decoding=autoregressive_decoding,
+    # )
+    # spd_time = generate(
+    #     model,
+    #     tokenizer,
+    #     dataset,
+    #     args.temperature,
+    #     decoding=speculative_decoding,
+    #     draft_model=draft_model,
+    # )
     ssd_time = generate(
         model,
         tokenizer,
