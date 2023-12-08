@@ -141,23 +141,6 @@ def get_paths(root: DecodingNode):
     return paths
 
 
-def get_num_objects_and_size_dict_cuda():
-    import gc
-
-    gc.collect()
-    torch.cuda.empty_cache()
-    num_objects = 0
-    object_size_dict = {}
-    for obj in gc.get_objects():
-        try:
-            if torch.is_tensor(obj) and obj.is_cuda:
-                num_objects += 1
-                object_size_dict[obj.size()] = object_size_dict.get(obj.size(), 0) + 1
-        except:
-            pass
-    return num_objects, object_size_dict
-
-
 def staged_speculative_decoding(
     inputs, model, draft_model, temperature=None, num_tokens=NUM_TOKENS, depth=DEPTH
 ):
