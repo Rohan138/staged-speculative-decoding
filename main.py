@@ -1,4 +1,12 @@
+from __future__ import print_function
+
+import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["GPU_DEBUG"] = "0"
+
 import argparse
+import sys
 
 import torch
 from datasets import Dataset, load_dataset
@@ -10,6 +18,7 @@ from decoding import (
     speculative_decoding,
     staged_speculative_decoding,
 )
+from gpu_profile import gpu_profile
 
 
 def parse_args():
@@ -117,10 +126,11 @@ def main():
         decoding=staged_speculative_decoding,
         draft_model=draft_model,
     )
-    print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
-    print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
-    print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
+    # print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
+    # print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
+    # print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
 
 
 if __name__ == "__main__":
+    sys.settrace(gpu_profile)
     main()

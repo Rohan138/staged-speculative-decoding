@@ -1,12 +1,13 @@
 import time
+from typing import List
 
 import torch
 from tqdm import tqdm
 
 INP_LENGTH = 256
 GEN_LENGTH = 128
-NUM_TOKENS = 5
-DEPTH = 2
+NUM_TOKENS = 3
+DEPTH = 3
 
 
 def autoregressive_decoding(inputs, model, draft_model, temperature):
@@ -52,12 +53,9 @@ class DecodingNode:
         self.draft_model = draft_model
         self.temperature = temperature
         self.num_tokens = num_tokens
-        self.children = []
-        self.build()
+        self.children: List[DecodingTree] = []
 
-    def build(self):
-        eos_token_id = self.draft_model.generation_config.eos_token_id
-
+    def get_next_inputs(self):
         outputs = self.draft_model(**self.inputs, use_cache=True)
         next_token_logits = outputs.logits[:, -1, :]
         if self.temperature is not None:
@@ -66,27 +64,16 @@ class DecodingNode:
         next_token_logits, next_token_ids = next_token_logits.topk(
             self.num_tokens, dim=-1
         )
-        self.input_ids = next_token_ids
-        self.is_eos_token = next_token_ids == eos_token_id
-        self.attention_mask = torch.cat(
-            (
-                self.inputs["attention_mask"].expand(1, self.num_tokens, -1),
-                (~self.is_eos_token).unsqueeze(-1).long(),
-            ),
-            dim=-1,
-        )
-        self.past_key_values = outputs.past_key_values
-        self.next_token_logits = next_token_logits
+        mask = self.inputs["attention_mask"]
+        attention_mask = torch.cat([mask, mask.new_ones((mask.shape[0], 1))], dim=-1)
+        past_key_values = outputs.past_key_values
 
-    def get_next_inputs(self):
-        return [
-            {
-                "input_ids": self.input_ids[:, idx],
-                "attention_mask": self.attention_mask[:, idx],
-                "past_key_values": self.past_key_values,
+        for idx in range(self.num_tokens):
+            yield {
+                "input_ids": next_token_ids[:, idx].unsqueeze(1),
+                "attention_mask": attention_mask,
+                "past_key_values": past_key_values,
             }
-            for idx in range(self.num_tokens)
-        ]
 
 
 class DecodingTree:
@@ -106,130 +93,190 @@ class DecodingTree:
         root = DecodingNode(
             self.inputs, self.draft_model, self.temperature, self.num_tokens
         )
-        if depth > 1:
-            for idx, next_input in enumerate(root.get_next_inputs()):
-                if root.is_eos_token[:, idx].any():
-                    continue
-                decoding_tree = DecodingTree(
+        eos_token_id = self.draft_model.generation_config.eos_token_id
+        if depth > 0 and not self.inputs["input_ids"].any() == eos_token_id:
+            for next_input in root.get_next_inputs():
+                tree = DecodingTree(
                     next_input,
                     self.draft_model,
                     self.temperature,
                     self.num_tokens,
                     depth - 1,
                 )
-                root.children.append(decoding_tree.root)
+                root.children.append(tree)
         return root
+
+    def __del__(self):
+        # Delete all children; otherwise will OOM!
+        if hasattr(self, "root") and hasattr(self.root, "children"):
+            for child in self.root.children:
+                del child
+        del self
 
 
 def count_nodes(root):
-    return 1 + sum(count_nodes(child) for child in root.children)
+    return 1 + sum(count_nodes(child.root) for child in root.children)
 
 
 def count_paths(root):
     if not root.children:
         return 1
-    return sum(count_paths(child) for child in root.children)
+    return sum(count_paths(child.root) for child in root.children)
 
-
-def get_logits(root):
-    if not root.children:
-        return []
-    logits = [root.next_token_logits.squeeze(0).tolist()]
-    for child in root.children:
-        logits.extend(get_logits(child))
-    return logits
 
 def get_paths(root: DecodingNode):
+    # For paths; concatenate `input_ids` along each path in the tree;
+    # but only return `attention_mask` and `past_key_values` from terminal nodes
     if not root.children:
-        return [root.get_next_inputs()]
+        return [root.inputs]
     paths = []
     for child in root.children:
-        paths.extend(get_paths(child))
+        child_paths = get_paths(child.root)
+        for child_path in child_paths:
+            child_path["input_ids"] = torch.cat(
+                [root.inputs["input_ids"], child_path["input_ids"]],
+                dim=-1,
+            )
+            paths.append(child_path)
     return paths
 
-def get_paths_and_cum_logits(root: DecodingNode, accumulator=0.0):
-    if not root.children:
-        # Root is a terminal node
-        # Return the transformer inputs for this node
-        # Return the accumulated logit prob for this node
-        return [root.get_next_inputs()], [accumulator]
 
-    child_logits = root.next_token_logits.squeeze(0).tolist()
-    paths = []
-    cum_logits = []
-    for child, child_logit in zip(root.children, child_logits):
-        child_paths, child_cum_logits = get_paths_and_cum_logits(
-            child, accumulator + child_logit
-        )
-        paths.extend(child_paths)
-        cum_logits.extend(child_cum_logits)
-    return paths, cum_logits
+def get_num_objects_and_size_dict_cuda():
+    import gc
+
+    gc.collect()
+    torch.cuda.empty_cache()
+    num_objects = 0
+    object_size_dict = {}
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) and obj.is_cuda:
+                num_objects += 1
+                object_size_dict[obj.size()] = object_size_dict.get(obj.size(), 0) + 1
+        except:
+            pass
+    return num_objects, object_size_dict
 
 
 def staged_speculative_decoding(
     inputs, model, draft_model, temperature=None, num_tokens=NUM_TOKENS, depth=DEPTH
 ):
-    # Generate initial kv cache for model
-    outputs = model(**inputs, use_cache=True)
-    past_key_values = outputs.past_key_values
+    # Generate initial kv cache from model
+    model_outputs = model(**inputs, use_cache=True)
+    total_length = model_outputs.logits.shape[1]
+    model_past_key_values = model_outputs.past_key_values
+    output_sequence = inputs["input_ids"]
+    eos_token_id = model.generation_config.eos_token_id
+
+    # Sample initial last token
+    new_logits = model_outputs.logits[:, -1]
+    if temperature is not None:
+        new_logits = new_logits / temperature
+        dist = torch.distributions.Categorical(logits=new_logits)
+        last_token = dist.sample()
+    else:
+        last_token = new_logits.argmax(dim=-1)
+
+    # Generate initial kv cache for draft model
+    input_ids = inputs["input_ids"]
+    attention_mask = inputs["attention_mask"]
+    draft_outputs = draft_model(
+        input_ids=input_ids[:, :-1],
+        attention_mask=attention_mask[:, :-1],
+        use_cache=True,
+    )
+    draft_past_key_values = draft_outputs.past_key_values
+    inputs = {
+        "input_ids": input_ids[:, -1:],
+        "attention_mask": attention_mask,
+        "past_key_values": draft_past_key_values,
+    }
 
     while True:
         # Build staged speculative decoding tree
-        decoding_tree = DecodingTree(
-            inputs, draft_model, temperature, num_tokens, depth
-        )
+        tree = DecodingTree(inputs, draft_model, temperature, num_tokens, depth)
+
         # Print tree statistics; uncomment to debug
-        print(f"Number of nodes: {count_nodes(decoding_tree.root)}")
-        print(f"Number of paths: {count_paths(decoding_tree.root)}")
-        print(f"Node logits: {get_logits(decoding_tree.root)}")
+        # print(f"Number of nodes: {count_nodes(tree.root)}")
+        # print(f"Number of paths: {count_paths(tree.root)}")
 
-        # depth-first search to get all paths ending in terminal nodes
-        paths = get_paths(decoding_tree.root)
-        # pad all paths to have length `num_tokens`
-        for path in paths:
-            # Note: this should be true iff there is eos at end of path
-            if len(path) < num_tokens:
-                path = path + [path[-1]] * (num_tokens - len(path))
+        # depth-first search to get all paths
+        paths = get_paths(tree.root)
 
-        # Concatenate List[List[Dict[Tensor]]] into Dict[Tensor]
-        input_ids = torch.stack(
-            [torch.stack([x["input_ids"] for x in path]) for path in paths]
-        )
-        attention_mask = torch.stack(
-            [torch.stack([x["attention_mask"] for x in path]) for path in paths]
-        )
-        # fold all but last dim into batch dimension
-        B, T, _ = input_ids.shape
-        input_ids = input_ids.view(-1, input_ids.shape[-1])
-        attention_mask = attention_mask.view(-1, attention_mask.shape[-1])
+        input_ids = torch.cat([path["input_ids"] for path in paths], dim=0)
+        attention_mask = torch.cat([path["attention_mask"] for path in paths], dim=0)
+
+        # drop first token from input_ids since that is the input to the draft model
+        # and is already represented by the previous kv cache
+        input_ids = input_ids[:, 1:]
 
         # Expand past_key_values to match input_ids
         expanded_past_key_values = []
-        for layer in past_key_values:
+        for layer in model_past_key_values:
             expanded_layer = []
             for item in layer:
                 expanded_item = item.expand(input_ids.shape[0], -1, -1, -1)
                 expanded_layer.append(expanded_item)
             expanded_past_key_values.append(expanded_layer)
-        past_key_values = expanded_past_key_values
 
         model_inputs = {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
-            "past_key_values": past_key_values,
+            "past_key_values": expanded_past_key_values,
         }
         model_outputs = model(**model_inputs, use_cache=True)
 
-        new_logits = model_outputs.logits[:, -num_tokens - 1 :]
+        new_logits = model_outputs.logits[:, -depth - 1 :]
+
         if temperature is not None:
             new_logits = new_logits / temperature
             dist = torch.distributions.Categorical(logits=new_logits)
             selected_tokens = dist.sample()
         else:
             selected_tokens = new_logits.argmax(dim=-1)
-        
-        candidate_tokens = input_ids.reshape(B, T, -1)
-        breakpoint()
+
+        # find valid indices where input token predicted by
+        # draft model is equal to previous output of model
+        check_first = input_ids[:, 0] == last_token
+        check_first = check_first.unsqueeze(1)
+        check_rest = input_ids[:, 1:] == selected_tokens[:, :-1]
+        check_all = torch.cat([check_first, check_rest], dim=1)
+        valid_indices = torch.cumsum(check_all, dim=1)[:, -1]
+
+        # choose the best valid index and find number of tokens generated
+        chosen_index = valid_indices.argmax().item()
+        num_tokens_generated = valid_indices[chosen_index].item()
+
+        # update output sequence
+        output_sequence = torch.cat(
+            [
+                output_sequence,
+                input_ids[chosen_index].unsqueeze(0),
+            ],
+            dim=1,
+        )
+
+        # update values for next iteration
+        last_token = selected_tokens[chosen_index][-1].unsqueeze(0)
+        input_idx = num_tokens_generated - 1
+        inputs["input_ids"] = input_ids[chosen_index][
+            input_idx : input_idx + 1
+        ].unsqueeze(0)
+        inputs["attention_mask"] = attention_mask[chosen_index].unsqueeze(0)
+        inputs["past_key_values"] = paths[chosen_index]["past_key_values"]
+        model_past_key_values = []
+        for layer in model_outputs.past_key_values:
+            chosen_layer = []
+            for item in layer:
+                chosen_item = item[chosen_index].unsqueeze(0)
+                chosen_layer.append(chosen_item)
+            model_past_key_values.append(chosen_layer)
+
+        total_length += num_tokens_generated
+        if last_token == eos_token_id or total_length >= INP_LENGTH + GEN_LENGTH:
+            break
+
+    return output_sequence[:, : max(output_sequence.shape[1], INP_LENGTH + GEN_LENGTH)]
 
 
 def generate(
