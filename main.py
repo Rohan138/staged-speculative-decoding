@@ -1,12 +1,4 @@
-from __future__ import print_function
-
-import os
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ["GPU_DEBUG"] = "0"
-
 import argparse
-import sys
 
 import torch
 from datasets import Dataset, load_dataset
@@ -18,7 +10,6 @@ from decoding import (
     speculative_decoding,
     staged_speculative_decoding,
 )
-from gpu_profile import gpu_profile
 
 
 def parse_args():
@@ -30,6 +21,7 @@ def parse_args():
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--num-samples", type=int, default=100)
     parser.add_argument("--device-map", type=str, default="auto")
+    parser.add_argument("--gpu-debug", action="store_true")
 
     args = parser.parse_args()
 
@@ -76,6 +68,12 @@ def print_model_info(model):
 
 def main():
     args = parse_args()
+    if args.gpu_debug:
+        import sys
+
+        from gpu_profile import gpu_profile
+
+        sys.settrace(gpu_profile)
 
     # Instantiate the tokenizer, model, and draft model
     tokenizer = AutoTokenizer.from_pretrained(args.model)
@@ -132,5 +130,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.settrace(gpu_profile)
     main()

@@ -1,24 +1,13 @@
-import datetime
 import linecache
 import os
 
-os.environ["CUDA_LAUNCH_BLOCKING"] = "0"
-
-import socket
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import torch
-
-# import pynvml3
 from py3nvml import py3nvml
 
 # different settings
 print_tensor_sizes = False
-use_incremental = True
-
-
-if "GPU_DEBUG" in os.environ:
-    gpu_profile_fn = f"Host_{socket.gethostname()}_gpu{os.environ['GPU_DEBUG']}_mem_prof-{datetime.datetime.now():%d-%b-%y-%H-%M-%S}.prof.txt"
-    print("profiling gpu usage to ", gpu_profile_fn)
 
 
 ## Global variables
@@ -42,24 +31,22 @@ def gpu_profile(frame, event, arg):
             if lineno is not None:
                 py3nvml.nvmlInit()
                 handle = py3nvml.nvmlDeviceGetHandleByIndex(
-                    int(os.environ["GPU_DEBUG"])
+                    int(os.environ["CUDA_VISIBLE_DEVICES"])
                 )
                 meminfo = py3nvml.nvmlDeviceGetMemoryInfo(handle)
                 line = linecache.getline(filename, lineno)
                 where_str = module_name + " " + func_name + ":" + str(lineno)
 
                 new_meminfo_used = meminfo.used
-                mem_display = (
-                    new_meminfo_used - last_meminfo_used
-                    if use_incremental
-                    else new_meminfo_used
-                )
-                with open(gpu_profile_fn, "a+") as f:
-                    f.write(
-                        f"{where_str:<50}"
-                        f":{(mem_display)/1024**2:<7.1f}Mb "
-                        f"{line.rstrip()}\n"
-                    )
+                mem_increment = new_meminfo_used - last_meminfo_used
+                with open("memory_log.txt", "a+") as f:
+                    if mem_increment != 0:
+                        f.write(
+                            f"{where_str:<50}"
+                            f":{(mem_increment)/1024**2:<7.1f}Mb "
+                            f":{(new_meminfo_used)/1024**2:<7.1f}Mb "
+                            f"{line.rstrip()}\n"
+                        )
 
                     last_meminfo_used = new_meminfo_used
                     if print_tensor_sizes is True:
@@ -87,9 +74,10 @@ def gpu_profile(frame, event, arg):
             module_name = frame.f_globals["__name__"]
             lineno = frame.f_lineno
 
-            # only profile codes within the parenet folder, otherwise there are too many function calls into other pytorch scripts
+            # only profile code within the parent folder, otherwise there are too many
+            # function calls into other pytorch scripts
             # need to modify the key words below to suit your case.
-            if "gpu_memory_profiling" not in os.path.dirname(os.path.abspath(filename)):
+            if os.getcwd() not in os.path.abspath(filename):
                 lineno = None  # skip current line evaluation
 
             if (
@@ -98,7 +86,7 @@ def gpu_profile(frame, event, arg):
                 or "gpu_profile" in module_name
                 or "tee_stdout" in module_name
             ):
-                lineno = None  # skip othe unnecessary lines
+                lineno = None  # skip other unnecessary lines
 
             return gpu_profile
 
