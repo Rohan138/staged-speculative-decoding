@@ -1,14 +1,16 @@
 import linecache
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 import torch
 from py3nvml import py3nvml
 
 # different settings
 print_tensor_sizes = False
 
+logfile = "memory_log.txt"
+
+if os.path.exists(logfile):
+    os.remove(logfile)
 
 ## Global variables
 last_tensor_sizes = set()
@@ -31,7 +33,7 @@ def gpu_profile(frame, event, arg):
             if lineno is not None:
                 py3nvml.nvmlInit()
                 handle = py3nvml.nvmlDeviceGetHandleByIndex(
-                    int(os.environ["CUDA_VISIBLE_DEVICES"])
+                    int(os.environ.get("CUDA_VISIBLE_DEVICES", "0"))
                 )
                 meminfo = py3nvml.nvmlDeviceGetMemoryInfo(handle)
                 line = linecache.getline(filename, lineno)
@@ -39,7 +41,7 @@ def gpu_profile(frame, event, arg):
 
                 new_meminfo_used = meminfo.used
                 mem_increment = new_meminfo_used - last_meminfo_used
-                with open("memory_log.txt", "a+") as f:
+                with open(logfile, "a+") as f:
                     if mem_increment != 0:
                         f.write(
                             f"{where_str:<50}"
