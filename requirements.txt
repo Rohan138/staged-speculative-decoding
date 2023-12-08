@@ -1,5 +1,5 @@
 torch
-git+https://github.com/huggingface/transformers.git
+transformers
 accelerate
 datasets
 bitsandbytes

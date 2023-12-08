@@ -42,7 +42,13 @@ def gpu_profile(frame, event, arg):
                 new_meminfo_used = meminfo.used
                 mem_increment = new_meminfo_used - last_meminfo_used
                 with open(logfile, "a+") as f:
-                    if mem_increment != 0:
+                    allowed_funcs = ["staged_speculative_decoding"]
+                    disallowed_linenos = list(range(198, 204)) + list(range(251, 257))
+                    if (
+                        func_name in allowed_funcs
+                        and lineno not in disallowed_linenos
+                        and mem_increment != 0
+                    ):
                         f.write(
                             f"{where_str:<50}"
                             f":{(mem_increment)/1024**2:<7.1f}Mb "

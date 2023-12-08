@@ -1,3 +1,4 @@
+import gc
 import time
 from typing import List
 
@@ -106,13 +107,6 @@ class DecodingTree:
                 root.children.append(tree)
         return root
 
-    def __del__(self):
-        # Delete all children; otherwise will OOM!
-        if hasattr(self, "root") and hasattr(self.root, "children"):
-            for child in self.root.children:
-                del child
-        del self
-
 
 def count_nodes(root):
     return 1 + sum(count_nodes(child.root) for child in root.children)
@@ -201,15 +195,16 @@ def staged_speculative_decoding(
                 expanded_item = item.expand(input_ids.shape[0], -1, -1, -1)
                 expanded_layer.append(expanded_item)
             expanded_past_key_values.append(expanded_layer)
+        model_past_key_values = expanded_past_key_values
 
         model_inputs = {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
-            "past_key_values": expanded_past_key_values,
+            "past_key_values": model_past_key_values,
         }
         model_outputs = model(**model_inputs, use_cache=True)
-
-        new_logits = model_outputs.logits[:, -depth - 1 :]
+        model_past_key_values = model_outputs.past_key_values
+        new_logits = model_outputs.logits
 
         if temperature is not None:
             new_logits = new_logits / temperature
@@ -234,7 +229,7 @@ def staged_speculative_decoding(
         output_sequence = torch.cat(
             [
                 output_sequence,
-                input_ids[chosen_index].unsqueeze(0),
+                input_ids[chosen_index, :num_tokens_generated].unsqueeze(0),
             ],
             dim=1,
         )
@@ -247,21 +242,28 @@ def staged_speculative_decoding(
         ].unsqueeze(0)
         inputs["attention_mask"] = attention_mask[chosen_index].unsqueeze(0)
         inputs["past_key_values"] = paths[chosen_index]["past_key_values"]
-        model_past_key_values = []
-        for layer in model_outputs.past_key_values:
+        chosen_model_past_key_values = []
+        for layer in model_past_key_values:
             chosen_layer = []
             for item in layer:
                 chosen_item = item[chosen_index].unsqueeze(0)
                 chosen_layer.append(chosen_item)
-            model_past_key_values.append(chosen_layer)
+            chosen_model_past_key_values.append(chosen_layer)
+        model_past_key_values = chosen_model_past_key_values
 
         total_length += num_tokens_generated
         if last_token == eos_token_id or total_length >= INP_LENGTH + GEN_LENGTH:
             break
 
+        del tree
+        del paths
+        gc.collect()
+        torch.cuda.empty_cache()
+
     return output_sequence[:, : max(output_sequence.shape[1], INP_LENGTH + GEN_LENGTH)]
 
 
+# @torch.inference_mode()
 def generate(
     model,
     tokenizer,
