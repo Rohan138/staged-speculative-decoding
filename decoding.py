@@ -197,7 +197,6 @@ def staged_speculative_decoding(
 
         model_inputs["input_ids"] = input_ids
         model_inputs["attention_mask"] = attention_mask
-
         expanded_past_key_values = []
         for layer in model_outputs.past_key_values:
             expanded_layer = []
