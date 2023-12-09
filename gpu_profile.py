@@ -1,10 +1,14 @@
+# utility script to profile per-line GPU memory usage
+# modify this if you're using it for a different project
+# to use this script, add the following lines at the top of your code:
+# import sys; from gpu_profile import gpu_profile; sys.settrace(gpu_profile)
+
 import linecache
 import os
 
 import torch
 from py3nvml import py3nvml
 
-# different settings
 print_tensor_sizes = False
 
 logfile = "memory_log.txt"
@@ -36,19 +40,14 @@ def gpu_profile(frame, event, arg):
                     int(os.environ.get("CUDA_VISIBLE_DEVICES", "0"))
                 )
                 meminfo = py3nvml.nvmlDeviceGetMemoryInfo(handle)
-                line = linecache.getline(filename, lineno)
+                line = linecache.getline(filename, lineno - 1)
                 where_str = module_name + " " + func_name + ":" + str(lineno)
 
                 new_meminfo_used = meminfo.used
                 mem_increment = new_meminfo_used - last_meminfo_used
                 with open(logfile, "a+") as f:
                     allowed_funcs = ["staged_speculative_decoding"]
-                    disallowed_linenos = list(range(198, 204)) + list(range(251, 257))
-                    if (
-                        func_name in allowed_funcs
-                        and lineno not in disallowed_linenos
-                        and mem_increment != 0
-                    ):
+                    if func_name in allowed_funcs and mem_increment != 0:
                         f.write(
                             f"{where_str:<50}"
                             f":{(mem_increment)/1024**2:<7.1f}Mb "

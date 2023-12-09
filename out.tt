@@ -1,0 +1,2 @@
+Model: gpt2, Parameters: 124 M, Memory: 0.24 GB
+Model: distilgpt2, Parameters: 82 M, Memory: 0.16 GB

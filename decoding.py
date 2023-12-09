@@ -1,8 +1,10 @@
+import copy
 import gc
 import time
 from typing import List
 
 import torch
+from torch.nn import functional as F
 from tqdm import tqdm
 
 INP_LENGTH = 256
@@ -95,7 +97,7 @@ class DecodingTree:
             self.inputs, self.draft_model, self.temperature, self.num_tokens
         )
         eos_token_id = self.draft_model.generation_config.eos_token_id
-        if depth > 0 and not self.inputs["input_ids"].any() == eos_token_id:
+        if depth > 0 and not (self.inputs["input_ids"] == eos_token_id).any():
             for next_input in root.get_next_inputs():
                 tree = DecodingTree(
                     next_input,
@@ -135,13 +137,26 @@ def get_paths(root: DecodingNode):
     return paths
 
 
+def expand_past_key_values(past_key_values, new_length):
+    # Expand past_key_values to match input_ids
+    expanded_past_key_values = []
+    for layer in past_key_values:
+        expanded_layer = []
+        for item in layer:
+            expanded_item = item.expand(new_length, -1, -1, -1)
+            expanded_layer.append(expanded_item)
+        expanded_past_key_values.append(expanded_layer)
+    return expanded_past_key_values
+
+
+@torch.no_grad()
 def staged_speculative_decoding(
     inputs, model, draft_model, temperature=None, num_tokens=NUM_TOKENS, depth=DEPTH
 ):
     # Generate initial kv cache from model
-    model_outputs = model(**inputs, use_cache=True)
+    model_inputs = copy.copy(inputs)
+    model_outputs = model(**model_inputs, use_cache=True)
     total_length = model_outputs.logits.shape[1]
-    model_past_key_values = model_outputs.past_key_values
     output_sequence = inputs["input_ids"]
     eos_token_id = model.generation_config.eos_token_id
 
@@ -162,11 +177,10 @@ def staged_speculative_decoding(
         attention_mask=attention_mask[:, :-1],
         use_cache=True,
     )
-    draft_past_key_values = draft_outputs.past_key_values
     inputs = {
         "input_ids": input_ids[:, -1:],
         "attention_mask": attention_mask,
-        "past_key_values": draft_past_key_values,
+        "past_key_values": draft_outputs.past_key_values,
     }
 
     while True:
@@ -180,6 +194,12 @@ def staged_speculative_decoding(
         # depth-first search to get all paths
         paths = get_paths(tree.root)
 
+        # pad input_ids and attention_mask
+        for path in paths:
+            pad_length = depth + 1 - path["input_ids"].shape[1]
+            path["input_ids"] = F.pad(path["input_ids"], (0, pad_length))
+            path["attention_mask"] = F.pad(path["attention_mask"], (0, pad_length))
+
         input_ids = torch.cat([path["input_ids"] for path in paths], dim=0)
         attention_mask = torch.cat([path["attention_mask"] for path in paths], dim=0)
 
@@ -187,23 +207,13 @@ def staged_speculative_decoding(
         # and is already represented by the previous kv cache
         input_ids = input_ids[:, 1:]
 
-        # Expand past_key_values to match input_ids
-        expanded_past_key_values = []
-        for layer in model_past_key_values:
-            expanded_layer = []
-            for item in layer:
-                expanded_item = item.expand(input_ids.shape[0], -1, -1, -1)
-                expanded_layer.append(expanded_item)
-            expanded_past_key_values.append(expanded_layer)
-        model_past_key_values = expanded_past_key_values
-
-        model_inputs = {
-            "input_ids": input_ids,
-            "attention_mask": attention_mask,
-            "past_key_values": model_past_key_values,
-        }
+        model_inputs["input_ids"] = input_ids
+        model_inputs["attention_mask"] = attention_mask
+        model_inputs["past_key_values"] = expand_past_key_values(
+            model_outputs.past_key_values,
+            input_ids.shape[0],
+        )
         model_outputs = model(**model_inputs, use_cache=True)
-        model_past_key_values = model_outputs.past_key_values
         new_logits = model_outputs.logits
 
         if temperature is not None:
@@ -243,27 +253,24 @@ def staged_speculative_decoding(
         inputs["attention_mask"] = attention_mask[chosen_index].unsqueeze(0)
         inputs["past_key_values"] = paths[chosen_index]["past_key_values"]
         chosen_model_past_key_values = []
-        for layer in model_past_key_values:
+        for layer in model_outputs.past_key_values:
             chosen_layer = []
             for item in layer:
                 chosen_item = item[chosen_index].unsqueeze(0)
                 chosen_layer.append(chosen_item)
             chosen_model_past_key_values.append(chosen_layer)
-        model_past_key_values = chosen_model_past_key_values
+        model_outputs.past_key_values = chosen_model_past_key_values
 
         total_length += num_tokens_generated
         if last_token == eos_token_id or total_length >= INP_LENGTH + GEN_LENGTH:
             break
 
-        del tree
-        del paths
-        gc.collect()
+        # explicitly free up memory; otherwise past_key_values take up too much space
         torch.cuda.empty_cache()
 
     return output_sequence[:, : max(output_sequence.shape[1], INP_LENGTH + GEN_LENGTH)]
 
 
-# @torch.inference_mode()
 def generate(
     model,
     tokenizer,

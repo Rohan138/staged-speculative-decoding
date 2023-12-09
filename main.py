@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 import torch
 from datasets import Dataset, load_dataset
@@ -11,7 +10,6 @@ from decoding import (
     speculative_decoding,
     staged_speculative_decoding,
 )
-from gpu_profile import gpu_profile
 
 
 def parse_args():
@@ -125,5 +123,9 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.settrace(gpu_profile)
+    # import sys
+
+    # from gpu_profile import gpu_profile
+
+    # sys.settrace(gpu_profile)
     main()

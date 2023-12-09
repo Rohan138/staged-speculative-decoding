@@ -1,108 +1,110 @@
-decoding staged_speculative_decoding:143          :250.0  Mb :1395.4 Mb     total_length = model_outputs.logits.shape[1]
-decoding staged_speculative_decoding:165          :100.0  Mb :1495.4 Mb     draft_past_key_values = draft_outputs.past_key_values
-decoding staged_speculative_decoding:206          :338.0  Mb :1895.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-36.0  Mb :1859.4 Mb     while True:
-decoding staged_speculative_decoding:206          :294.0  Mb :2203.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-46.0  Mb :2157.4 Mb     while True:
-decoding staged_speculative_decoding:206          :308.0  Mb :2521.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-40.0  Mb :2481.4 Mb     while True:
-decoding staged_speculative_decoding:206          :306.0  Mb :2839.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-48.0  Mb :2791.4 Mb     while True:
-decoding staged_speculative_decoding:206          :306.0  Mb :3155.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-46.0  Mb :3109.4 Mb     while True:
-decoding staged_speculative_decoding:206          :306.0  Mb :3473.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-42.0  Mb :3431.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :3799.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-20.0  Mb :3779.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :4123.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :4121.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :4445.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-4.0   Mb :4441.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :4771.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:206          :300.0  Mb :5093.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :5091.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :5415.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :5413.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :5739.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :5737.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :6063.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :6061.4 Mb     while True:
-decoding staged_speculative_decoding:206          :300.0  Mb :6385.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :6383.4 Mb     while True:
-decoding staged_speculative_decoding:206          :372.0  Mb :6779.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-24.0  Mb :6755.4 Mb     while True:
-decoding staged_speculative_decoding:206          :372.0  Mb :7147.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-26.0  Mb :7121.4 Mb     while True:
-decoding staged_speculative_decoding:206          :344.0  Mb :7489.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :7487.4 Mb     while True:
-decoding staged_speculative_decoding:206          :350.0  Mb :7861.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-4.0   Mb :7857.4 Mb     while True:
-decoding staged_speculative_decoding:206          :348.0  Mb :8225.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :8223.4 Mb     while True:
-decoding staged_speculative_decoding:206          :350.0  Mb :8593.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:206          :350.0  Mb :8963.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-4.0   Mb :8959.4 Mb     while True:
-decoding staged_speculative_decoding:206          :350.0  Mb :9335.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-26.0  Mb :9309.4 Mb     while True:
-decoding staged_speculative_decoding:206          :350.0  Mb :9699.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-42.0  Mb :9657.4 Mb     while True:
-decoding staged_speculative_decoding:206          :346.0  Mb :10061.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-58.0  Mb :10003.4Mb     while True:
-decoding staged_speculative_decoding:206          :346.0  Mb :10423.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-60.0  Mb :10363.4Mb     while True:
-decoding staged_speculative_decoding:206          :346.0  Mb :10783.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-52.0  Mb :10731.4Mb     while True:
-decoding staged_speculative_decoding:206          :348.0  Mb :11147.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-60.0  Mb :11087.4Mb     while True:
-decoding staged_speculative_decoding:206          :328.0  Mb :11507.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-12.0  Mb :11495.4Mb     while True:
-decoding staged_speculative_decoding:206          :316.0  Mb :11869.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :11867.4Mb     while True:
-decoding staged_speculative_decoding:206          :316.0  Mb :12235.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-44.0  Mb :12191.4Mb     while True:
-decoding staged_speculative_decoding:206          :328.0  Mb :12603.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-36.0  Mb :12567.4Mb     while True:
-decoding staged_speculative_decoding:206          :402.0  Mb :13049.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-66.0  Mb :12983.4Mb     while True:
-decoding staged_speculative_decoding:206          :410.0  Mb :13465.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-64.0  Mb :13401.4Mb     while True:
-decoding staged_speculative_decoding:206          :378.0  Mb :13851.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-36.0  Mb :13815.4Mb     while True:
-decoding staged_speculative_decoding:206          :378.0  Mb :14265.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-40.0  Mb :14225.4Mb     while True:
-decoding staged_speculative_decoding:206          :378.0  Mb :14677.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-44.0  Mb :14633.4Mb     while True:
-decoding staged_speculative_decoding:206          :382.0  Mb :15091.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-44.0  Mb :15047.4Mb     while True:
-decoding staged_speculative_decoding:206          :378.0  Mb :15503.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-44.0  Mb :15459.4Mb     while True:
-decoding staged_speculative_decoding:206          :382.0  Mb :15917.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-18.0  Mb :15899.4Mb     while True:
-decoding staged_speculative_decoding:206          :376.0  Mb :16331.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-4.0   Mb :16327.4Mb     while True:
-decoding staged_speculative_decoding:206          :366.0  Mb :16747.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :16745.4Mb     while True:
-decoding staged_speculative_decoding:206          :366.0  Mb :17163.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :17161.4Mb     while True:
-decoding staged_speculative_decoding:206          :366.0  Mb :17581.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-4.0   Mb :17577.4Mb     while True:
-decoding staged_speculative_decoding:206          :366.0  Mb :17997.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :17995.4Mb     while True:
-decoding staged_speculative_decoding:206          :364.0  Mb :18413.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :18411.4Mb     while True:
-decoding staged_speculative_decoding:206          :366.0  Mb :18831.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:206          :366.0  Mb :19249.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-2.0   Mb :19247.4Mb     while True:
-decoding staged_speculative_decoding:206          :366.0  Mb :19669.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:206          :448.0  Mb :20171.4Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-18318.0Mb :1853.4 Mb     while True:
-decoding staged_speculative_decoding:206          :306.0  Mb :2207.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-46.0  Mb :2161.4 Mb     while True:
-decoding staged_speculative_decoding:206          :308.0  Mb :2525.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-48.0  Mb :2477.4 Mb     while True:
-decoding staged_speculative_decoding:206          :306.0  Mb :2841.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-46.0  Mb :2795.4 Mb     while True:
-decoding staged_speculative_decoding:206          :306.0  Mb :3159.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-44.0  Mb :3115.4 Mb     while True:
-decoding staged_speculative_decoding:206          :304.0  Mb :3477.4 Mb         model_past_key_values = model_outputs.past_key_values
-decoding staged_speculative_decoding:172          :-46.0  Mb :3431.4 Mb     while True:
+decoding staged_speculative_decoding:159          :128.0  Mb :1135.2 Mb     model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:181          :26.0   Mb :1161.2 Mb     inputs = {
+decoding staged_speculative_decoding:217          :296.0  Mb :1517.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-2.0   Mb :1515.2 Mb 
+decoding staged_speculative_decoding:217          :252.0  Mb :1831.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-58.0  Mb :1773.2 Mb 
+decoding staged_speculative_decoding:186          :-58.0  Mb :1755.2 Mb 
+decoding staged_speculative_decoding:186          :-38.0  Mb :1775.2 Mb 
+decoding staged_speculative_decoding:217          :12.0   Mb :1843.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-56.0  Mb :1787.2 Mb 
+decoding staged_speculative_decoding:186          :-56.0  Mb :1789.2 Mb 
+decoding staged_speculative_decoding:186          :-44.0  Mb :1815.2 Mb 
+decoding staged_speculative_decoding:186          :-68.0  Mb :1805.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1801.2 Mb 
+decoding staged_speculative_decoding:186          :-72.0  Mb :1803.2 Mb 
+decoding staged_speculative_decoding:186          :-76.0  Mb :1799.2 Mb 
+decoding staged_speculative_decoding:186          :-76.0  Mb :1799.2 Mb 
+decoding staged_speculative_decoding:186          :-78.0  Mb :1797.2 Mb 
+decoding staged_speculative_decoding:186          :-78.0  Mb :1797.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1799.2 Mb 
+decoding staged_speculative_decoding:217          :280.0  Mb :2153.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-328.0 Mb :1825.2 Mb 
+decoding staged_speculative_decoding:217          :336.0  Mb :2239.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-362.0 Mb :1877.2 Mb 
+decoding staged_speculative_decoding:186          :-76.0  Mb :1869.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :1875.2 Mb 
+decoding staged_speculative_decoding:217          :28.0   Mb :1979.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-98.0  Mb :1881.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1883.2 Mb 
+decoding staged_speculative_decoding:217          :14.0   Mb :1973.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-74.0  Mb :1899.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1899.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1899.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1875.2 Mb 
+decoding staged_speculative_decoding:186          :-44.0  Mb :1903.2 Mb 
+decoding staged_speculative_decoding:186          :-76.0  Mb :1897.2 Mb 
+decoding staged_speculative_decoding:186          :-72.0  Mb :1901.2 Mb 
+decoding staged_speculative_decoding:186          :-64.0  Mb :1929.2 Mb 
+decoding staged_speculative_decoding:186          :-86.0  Mb :1923.2 Mb 
+decoding staged_speculative_decoding:186          :-96.0  Mb :1921.2 Mb 
+decoding staged_speculative_decoding:186          :-102.0 Mb :1923.2 Mb 
+decoding staged_speculative_decoding:217          :368.0  Mb :2393.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-438.0 Mb :1955.2 Mb 
+decoding staged_speculative_decoding:217          :368.0  Mb :2425.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-424.0 Mb :2001.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :2001.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :1999.2 Mb 
+decoding staged_speculative_decoding:186          :-102.0 Mb :1985.2 Mb 
+decoding staged_speculative_decoding:186          :-90.0  Mb :1997.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :1999.2 Mb 
+decoding staged_speculative_decoding:186          :-106.0 Mb :1997.2 Mb 
+decoding staged_speculative_decoding:186          :-102.0 Mb :2001.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :1999.2 Mb 
+decoding staged_speculative_decoding:186          :-100.0 Mb :2003.2 Mb 
+decoding staged_speculative_decoding:186          :-102.0 Mb :1985.2 Mb 
+decoding staged_speculative_decoding:186          :-84.0  Mb :2003.2 Mb 
+decoding staged_speculative_decoding:217          :16.0   Mb :2119.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-102.0 Mb :2017.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :2017.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :2015.2 Mb 
+decoding staged_speculative_decoding:186          :-100.0 Mb :2019.2 Mb 
+decoding staged_speculative_decoding:217          :432.0  Mb :2549.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-484.0 Mb :2065.2 Mb 
+decoding staged_speculative_decoding:186          :-102.0 Mb :2033.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :2065.2 Mb 
+decoding staged_speculative_decoding:217          :414.0  Mb :2581.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-470.0 Mb :2111.2 Mb 
+decoding staged_speculative_decoding:186          :-100.0 Mb :2113.2 Mb 
+decoding staged_speculative_decoding:186          :-564.0 Mb :1649.2 Mb 
+decoding staged_speculative_decoding:217          :264.0  Mb :1977.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-74.0  Mb :1903.2 Mb 
+decoding staged_speculative_decoding:217          :20.0   Mb :1979.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-56.0  Mb :1923.2 Mb 
+decoding staged_speculative_decoding:186          :-56.0  Mb :1923.2 Mb 
+decoding staged_speculative_decoding:186          :-78.0  Mb :1903.2 Mb 
+decoding staged_speculative_decoding:217          :12.0   Mb :1973.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-54.0  Mb :1919.2 Mb 
+decoding staged_speculative_decoding:186          :-44.0  Mb :1945.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :1933.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1931.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1931.2 Mb 
+decoding staged_speculative_decoding:186          :-78.0  Mb :1927.2 Mb 
+decoding staged_speculative_decoding:186          :-76.0  Mb :1929.2 Mb 
+decoding staged_speculative_decoding:186          :-78.0  Mb :1927.2 Mb 
+decoding staged_speculative_decoding:186          :-76.0  Mb :1929.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1929.2 Mb 
+decoding staged_speculative_decoding:217          :308.0  Mb :2313.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-350.0 Mb :1963.2 Mb 
+decoding staged_speculative_decoding:217          :14.0   Mb :2051.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-74.0  Mb :1977.2 Mb 
+decoding staged_speculative_decoding:186          :-92.0  Mb :1959.2 Mb 
+decoding staged_speculative_decoding:217          :20.0   Mb :2051.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-76.0  Mb :1975.2 Mb 
+decoding staged_speculative_decoding:217          :14.0   Mb :2065.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-96.0  Mb :1969.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1971.2 Mb 
+decoding staged_speculative_decoding:217          :14.0   Mb :2059.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-76.0  Mb :1983.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1985.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :1989.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1985.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :1989.2 Mb 
+decoding staged_speculative_decoding:186          :-74.0  Mb :1985.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :1989.2 Mb 
+decoding staged_speculative_decoding:186          :-70.0  Mb :2009.2 Mb 
+decoding staged_speculative_decoding:186          :-90.0  Mb :2015.2 Mb 
+decoding staged_speculative_decoding:186          :-104.0 Mb :2007.2 Mb 
+decoding staged_speculative_decoding:186          :-102.0 Mb :2009.2 Mb 
+decoding staged_speculative_decoding:217          :16.0   Mb :2127.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:186          :-120.0 Mb :2007.2 Mb 
