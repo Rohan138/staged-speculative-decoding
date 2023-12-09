@@ -137,18 +137,6 @@ def get_paths(root: DecodingNode):
     return paths
 
 
-def expand_past_key_values(past_key_values, new_length):
-    # Expand past_key_values to match input_ids
-    expanded_past_key_values = []
-    for layer in past_key_values:
-        expanded_layer = []
-        for item in layer:
-            expanded_item = item.expand(new_length, -1, -1, -1)
-            expanded_layer.append(expanded_item)
-        expanded_past_key_values.append(expanded_layer)
-    return expanded_past_key_values
-
-
 @torch.no_grad()
 def staged_speculative_decoding(
     inputs, model, draft_model, temperature=None, num_tokens=NUM_TOKENS, depth=DEPTH
@@ -209,10 +197,15 @@ def staged_speculative_decoding(
 
         model_inputs["input_ids"] = input_ids
         model_inputs["attention_mask"] = attention_mask
-        model_inputs["past_key_values"] = expand_past_key_values(
-            model_outputs.past_key_values,
-            input_ids.shape[0],
-        )
+
+        expanded_past_key_values = []
+        for layer in model_outputs.past_key_values:
+            expanded_layer = []
+            for item in layer:
+                expanded_item = item.expand(input_ids.shape[0], -1, -1, -1)
+                expanded_layer.append(expanded_item)
+            expanded_past_key_values.append(expanded_layer)
+        model_inputs["past_key_values"] = expanded_past_key_values
         model_outputs = model(**model_inputs, use_cache=True)
         new_logits = model_outputs.logits
 
