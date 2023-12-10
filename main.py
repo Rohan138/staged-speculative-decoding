@@ -94,21 +94,21 @@ def main():
     # Load the dataset
     dataset = get_dataset(args.dataset, args.num_samples)
 
-    # ard_time = generate(
-    #     model,
-    #     tokenizer,
-    #     dataset,
-    #     args.temperature,
-    #     decoding=autoregressive_decoding,
-    # )
-    # spd_time = generate(
-    #     model,
-    #     tokenizer,
-    #     dataset,
-    #     args.temperature,
-    #     decoding=speculative_decoding,
-    #     draft_model=draft_model,
-    # )
+    ard_time = generate(
+        model,
+        tokenizer,
+        dataset,
+        args.temperature,
+        decoding=autoregressive_decoding,
+    )
+    spd_time = generate(
+        model,
+        tokenizer,
+        dataset,
+        args.temperature,
+        decoding=speculative_decoding,
+        draft_model=draft_model,
+    )
     ssd_time = generate(
         model,
         tokenizer,
@@ -117,9 +117,9 @@ def main():
         decoding=staged_speculative_decoding,
         draft_model=draft_model,
     )
-    # print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
-    # print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
-    # print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
+    print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
+    print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
+    print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
 
 
 if __name__ == "__main__":
