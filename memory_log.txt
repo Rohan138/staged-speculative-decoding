@@ -1,0 +1,52 @@
+decoding staged_speculative_decoding:165          :128.0  Mb :1135.2 Mb     model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:178          :26.0   Mb :1161.2 Mb         draft_inputs = {
+decoding staged_speculative_decoding:219          :2336.0 Mb :4051.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-42.0  Mb :4009.2 Mb 
+decoding staged_speculative_decoding:178          :6.0    Mb :4015.2 Mb         draft_inputs = {
+decoding staged_speculative_decoding:219          :1630.0 Mb :6035.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-746.0 Mb :5289.2 Mb 
+decoding staged_speculative_decoding:219          :2492.0 Mb :8349.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-2640.0Mb :5709.2 Mb 
+decoding staged_speculative_decoding:219          :2540.0 Mb :8971.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-2110.0Mb :6861.2 Mb 
+decoding staged_speculative_decoding:219          :2588.0 Mb :10029.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3212.0Mb :6817.2 Mb 
+decoding staged_speculative_decoding:219          :2636.0 Mb :10175.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3236.0Mb :6939.2 Mb 
+decoding staged_speculative_decoding:219          :2684.0 Mb :10319.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3306.0Mb :7013.2 Mb 
+decoding staged_speculative_decoding:219          :2732.0 Mb :10463.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3346.0Mb :7117.2 Mb 
+decoding staged_speculative_decoding:219          :2780.0 Mb :10607.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3400.0Mb :7207.2 Mb 
+decoding staged_speculative_decoding:219          :2828.0 Mb :10751.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3448.0Mb :7303.2 Mb 
+decoding staged_speculative_decoding:219          :2876.0 Mb :10889.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3500.0Mb :7389.2 Mb 
+decoding staged_speculative_decoding:219          :2924.0 Mb :11033.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3534.0Mb :7499.2 Mb 
+decoding staged_speculative_decoding:219          :94.0   Mb :8067.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-856.0 Mb :7211.2 Mb 
+decoding staged_speculative_decoding:219          :3020.0 Mb :10947.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3350.0Mb :7597.2 Mb 
+decoding staged_speculative_decoding:219          :3116.0 Mb :11573.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3598.0Mb :7975.2 Mb 
+decoding staged_speculative_decoding:219          :138.0  Mb :8973.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-872.0 Mb :8101.2 Mb 
+decoding staged_speculative_decoding:219          :94.0   Mb :8691.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-984.0 Mb :7707.2 Mb 
+decoding staged_speculative_decoding:219          :3260.0 Mb :11929.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-3608.0Mb :8321.2 Mb 
+decoding staged_speculative_decoding:219          :3208.0 Mb :12451.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-4080.0Mb :8371.2 Mb 
+decoding staged_speculative_decoding:219          :3356.0 Mb :12691.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-4186.0Mb :8505.2 Mb 
+decoding staged_speculative_decoding:219          :3404.0 Mb :12871.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-4178.0Mb :8693.2 Mb 
+decoding staged_speculative_decoding:219          :3452.0 Mb :13111.2Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-7954.0Mb :5157.2 Mb 
+decoding staged_speculative_decoding:178          :6.0    Mb :5163.2 Mb         draft_inputs = {
+decoding staged_speculative_decoding:219          :2348.0 Mb :8093.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-702.0 Mb :7391.2 Mb 
+decoding staged_speculative_decoding:219          :140.0  Mb :8099.2 Mb         model_outputs = model(**model_inputs, use_cache=True)
+decoding staged_speculative_decoding:167          :-716.0 Mb :7383.2 Mb 
