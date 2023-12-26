@@ -46,7 +46,7 @@ def gpu_profile(frame, event, arg):
                 new_meminfo_used = meminfo.used
                 mem_increment = new_meminfo_used - last_meminfo_used
                 with open(logfile, "a+") as f:
-                    allowed_funcs = ["staged_speculative_decoding"]
+                    allowed_funcs = ["staged_assisted_decoding"]
                     if func_name in allowed_funcs and mem_increment != 0:
                         f.write(
                             f"{where_str:<50}"
