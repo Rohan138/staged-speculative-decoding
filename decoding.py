@@ -12,7 +12,7 @@ NUM_TOKENS = 5
 TOPK = 3
 
 
-def autoregressive_decoding(inputs, model, draft_model, temperature):
+def autoregressive_decoding(inputs, model, temperature=None):
     if temperature is not None:
         kwargs = {"temperature": temperature, "do_sample": True}
     else:
@@ -27,7 +27,7 @@ def autoregressive_decoding(inputs, model, draft_model, temperature):
 
 
 def speculative_decoding(
-    inputs, model, draft_model, temperature=None, num_tokens=NUM_TOKENS
+    inputs, model, temperature=None, draft_model=None, num_tokens=NUM_TOKENS
 ):
     if temperature is not None:
         kwargs = {"temperature": temperature, "do_sample": True}
@@ -145,10 +145,9 @@ def get_tree_past_key_values(root: DecodingNode):
             past_key_values.append(cat_past_key_values)
     return past_key_values
 
-
 @torch.no_grad()
 def staged_speculative_decoding(
-    inputs, model, draft_model, temperature=None, topk=TOPK, num_tokens=NUM_TOKENS
+    inputs, model, temperature=None, draft_model=None, topk=TOPK, num_tokens=NUM_TOKENS
 ):
     inputs = copy.copy(inputs)
     output_sequence = inputs["input_ids"]
@@ -228,7 +227,10 @@ def staged_speculative_decoding(
         # find valid indices where input token predicted by
         # draft model is equal to previous output of model
         check_all = input_ids[:, 1:] == selected_tokens[:, :-1]
-        valid_indices = torch.cumsum(check_all, dim=1)[:, -1]
+        # hacky way to ensure that we "stop early" if False is found in check_all
+        # avoids out of bounds error due to padding input_ids above
+        valid_indices = torch.cumsum(check_all, dim=1) * torch.cumprod(check_all, dim=1)
+        valid_indices = torch.max(valid_indices, dim=1).values
 
         # choose the best valid index and find number of tokens generated
         chosen_index = valid_indices.argmax().item()
@@ -267,7 +269,7 @@ def staged_speculative_decoding(
         # explicitly free up unused memory before next iteration
         torch.cuda.empty_cache()
 
-    return output_sequence[:, : max(output_sequence.shape[1], INP_LENGTH + GEN_LENGTH)]
+    return output_sequence[:, : min(output_sequence.shape[1], INP_LENGTH + GEN_LENGTH)]
 
 
 def generate(
@@ -275,22 +277,19 @@ def generate(
     tokenizer,
     dataset,
     temperature,
-    decoding,
-    draft_model=None,
+    decoding_method,
+    **kwargs,
 ):
-    assert decoding in [
+    assert decoding_method in [
         autoregressive_decoding,
         speculative_decoding,
         staged_speculative_decoding,
-    ], f"Unknown decoding method: {decoding}"
-    assert (
-        decoding is not autoregressive_decoding or draft_model is None
-    ), "Cannot use draft model with autoregressive decoding"
+    ], f"Unknown decoding method: {decoding_method}"
 
     gen_time = []
     num_tokens = []
 
-    for data in tqdm(dataset, desc=decoding.__name__):
+    for data in tqdm(dataset, desc=decoding_method.__name__):
         inputs = tokenizer(
             data,
             return_tensors="pt",
@@ -302,7 +301,7 @@ def generate(
 
         torch.cuda.synchronize()
         start = time.monotonic()
-        gen_out = decoding(inputs, model, draft_model, temperature)
+        gen_out = decoding_method(inputs, model, temperature, **kwargs)
         torch.cuda.synchronize()
         end = time.monotonic()
 

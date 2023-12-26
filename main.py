@@ -17,6 +17,8 @@ def parse_args():
     parser.add_argument("--dataset", type=str, default="c4")
     parser.add_argument("--model", type=str)
     parser.add_argument("--draft-model", type=str)
+    parser.add_argument("--num-tokens", type=int, default=5)
+    parser.add_argument("--topk", type=int, default=3)
     parser.add_argument("--dtype", type=str)
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--num-samples", type=int, default=100)
@@ -99,27 +101,30 @@ def main():
         tokenizer,
         dataset,
         args.temperature,
-        decoding=autoregressive_decoding,
+        decoding_method=autoregressive_decoding,
     )
     spd_time = generate(
         model,
         tokenizer,
         dataset,
         args.temperature,
-        decoding=speculative_decoding,
+        decoding_method=speculative_decoding,
         draft_model=draft_model,
+        num_tokens=args.num_tokens,
     )
     ssd_time = generate(
         model,
         tokenizer,
         dataset,
         args.temperature,
-        decoding=staged_speculative_decoding,
+        decoding_method=staged_speculative_decoding,
         draft_model=draft_model,
+        num_tokens=args.num_tokens,
+        topk=args.topk,
     )
     print(f"time/token: {ard_time:.3f} ms, {spd_time:.3f} ms, {ssd_time:.3f} ms")
     print(f"speculative decoding speedup: {ard_time / spd_time:.3f}")
-    print(f"staged speculative decoding speedup: {ard_time / spd_time:.3f}")
+    print(f"staged speculative decoding speedup: {ard_time / ssd_time:.3f}")
 
 
 if __name__ == "__main__":
