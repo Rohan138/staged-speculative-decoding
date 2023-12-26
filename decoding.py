@@ -1,10 +1,11 @@
 import copy
 import time
-from typing import List
 
 import torch
 from torch.nn import functional as F
 from tqdm import tqdm
+
+import einops
 
 INP_LENGTH = 256
 GEN_LENGTH = 128
@@ -49,102 +50,6 @@ def speculative_decoding(
     )
 
 
-class DecodingNode:
-    def __init__(self, inputs, draft_model, temperature=None, topk=TOPK):
-        self.inputs = inputs
-        self.draft_model = draft_model
-        self.temperature = temperature
-        self.topk = topk
-        self.children: List[DecodingTree] = []
-
-    def get_next_inputs(self):
-        outputs = self.draft_model(**self.inputs, use_cache=True)
-        next_token_logits = outputs.logits[:, -1, :]
-        if self.temperature is not None:
-            next_token_logits = next_token_logits / self.temperature
-
-        next_token_logits, next_token_ids = next_token_logits.topk(self.topk, dim=-1)
-        mask = self.inputs["attention_mask"]
-        attention_mask = torch.cat([mask, mask.new_ones((mask.shape[0], 1))], dim=-1)
-        past_key_values = outputs.past_key_values
-
-        for idx in range(self.topk):
-            yield {
-                "input_ids": next_token_ids[:, idx : idx + 1],
-                "attention_mask": attention_mask,
-                "past_key_values": past_key_values,
-            }
-
-
-class DecodingTree:
-    def __init__(
-        self,
-        inputs,
-        draft_model,
-        temperature=None,
-        topk=TOPK,
-        num_tokens=NUM_TOKENS,
-    ):
-        self.inputs = inputs
-        self.draft_model = draft_model
-        self.temperature = temperature
-        self.topk = topk
-        self.num_tokens = num_tokens
-        self.root = self.build()
-
-    def build(self, num_tokens=None):
-        if num_tokens is None:
-            num_tokens = self.num_tokens
-        root = DecodingNode(self.inputs, self.draft_model, self.temperature, self.topk)
-        eos_token_id = self.draft_model.generation_config.eos_token_id
-        if num_tokens > 0 and not (self.inputs["input_ids"] == eos_token_id).any():
-            for next_input in root.get_next_inputs():
-                tree = DecodingTree(
-                    next_input,
-                    self.draft_model,
-                    self.temperature,
-                    self.topk,
-                    num_tokens - 1,
-                )
-                root.children.append(tree)
-        return root
-
-
-def count_nodes(root):
-    return 1 + sum(count_nodes(child.root) for child in root.children)
-
-
-def count_paths(root):
-    if not root.children:
-        return 1
-    return sum(count_paths(child.root) for child in root.children)
-
-
-def get_tree_input_ids(root: DecodingNode):
-    # concatenate `input_ids` along each node
-    root_input_ids = root.inputs["input_ids"]
-    if not root.children:
-        return [root_input_ids]
-    input_ids = []
-    for child in root.children:
-        for child_input_ids in get_tree_input_ids(child.root):
-            cat_input_ids = torch.cat([root_input_ids, child_input_ids], dim=-1)
-            input_ids.append(cat_input_ids)
-    return input_ids
-
-
-def get_tree_past_key_values(root: DecodingNode):
-    # concatenate `past_key_values` along each node
-    root_past_key_values = root.inputs["past_key_values"]
-    if not root.children:
-        return [[root_past_key_values]]
-    past_key_values = []
-    for child in root.children:
-        for child_past_key_values in get_tree_past_key_values(child.root):
-            cat_past_key_values = [root_past_key_values, *child_past_key_values]
-            past_key_values.append(cat_past_key_values)
-    return past_key_values
-
 @torch.no_grad()
 def staged_speculative_decoding(
     inputs, model, temperature=None, draft_model=None, topk=TOPK, num_tokens=NUM_TOKENS
@@ -180,21 +85,62 @@ def staged_speculative_decoding(
         }
 
         # Build staged speculative decoding tree
-        tree = DecodingTree(draft_inputs, draft_model, temperature, topk, num_tokens)
+        tree_input_ids = []
+        tree_past_key_values = []
 
-        # Print tree statistics; uncomment to debug
-        # print(f"Number of nodes: {count_nodes(tree.root)}")
-        # print(f"Number of paths: {count_paths(tree.root)}")
+        tree_input_ids.append(
+            einops.repeat(
+                draft_inputs["input_ids"], "b ... -> (b k) ...", k=topk**num_tokens
+            )
+        )
+        tree_past_key_values.append(draft_inputs["past_key_values"])
 
-        # depth-first search to get all input_ids
-        tree_input_ids = get_tree_input_ids(tree.root)
+        for depth in range(num_tokens):
+            draft_outputs = draft_model(**draft_inputs, use_cache=True)
+            next_token_logits = draft_outputs.logits[:, -1, :]
+            if temperature is not None:
+                next_token_logits = next_token_logits / temperature
 
-        # pad input_ids that end prematurely in an eos token to length `depth + 1`
-        for idx in range(len(tree_input_ids)):
-            pad_length = num_tokens + 1 - tree_input_ids[idx].shape[1]
-            if pad_length > 0:
-                tree_input_ids[idx] = F.pad(tree_input_ids[idx], (0, pad_length))
-        input_ids = torch.cat(tree_input_ids, dim=0)
+            _, next_token_ids = next_token_logits.topk(topk, dim=-1)
+            mask = draft_inputs["attention_mask"]
+            attention_mask = torch.cat(
+                [mask, mask.new_ones((mask.shape[0], 1))], dim=-1
+            )
+
+            # Update draft inputs for next iteration
+            # Fold leaf tokens into batch dimension
+            next_token_ids = next_token_ids.reshape(-1, 1)
+            draft_inputs["input_ids"] = next_token_ids
+            draft_inputs["attention_mask"] = einops.repeat(
+                attention_mask, "b ... -> (b k) ...", k=topk
+            )
+
+            reshaped_past_key_values = []
+            for layer in draft_outputs.past_key_values:
+                reshaped_layer = []
+                for item in layer:
+                    reshaped_item = einops.repeat(item, "b ... -> (b k) ...", k=topk)
+                    reshaped_layer.append(reshaped_item)
+                reshaped_past_key_values.append(reshaped_layer)
+            draft_inputs["past_key_values"] = reshaped_past_key_values
+
+            tree_input_ids.append(
+                einops.repeat(
+                    draft_inputs["input_ids"],
+                    "b ... -> (b k) ...",
+                    k=topk ** (num_tokens - depth - 1),
+                )
+            )
+            tree_past_key_values.append(draft_inputs["past_key_values"])
+
+            if (next_token_ids == eos_token_id).any():
+                break
+
+        # TODO (Rohan138): Handle eos_token better; right now we early stop
+        # the depthwise generation of the whole tree if eos_token is found,
+        # then pad with zeros
+        input_ids = torch.cat(tree_input_ids, dim=1)
+        input_ids = F.pad(input_ids, (0, num_tokens + 1 - input_ids.shape[1]))
 
         mask = inputs["attention_mask"]
         attention_mask = torch.cat(
@@ -202,14 +148,16 @@ def staged_speculative_decoding(
         )
 
         model_inputs["input_ids"] = input_ids
-        model_inputs["attention_mask"] = attention_mask[:, :-1].expand(
-            input_ids.shape[0], -1
+        model_inputs["attention_mask"] = einops.repeat(
+            attention_mask[:, :-1], "b ... -> (b k) ...", k=input_ids.shape[0]
         )
         expanded_past_key_values = []
         for layer in model_outputs.past_key_values:
             expanded_layer = []
             for item in layer:
-                expanded_item = item.expand(input_ids.shape[0], -1, -1, -1)
+                expanded_item = einops.repeat(
+                    item, "b ... -> (b k) ...", k=input_ids.shape[0]
+                )
                 expanded_layer.append(expanded_item)
             expanded_past_key_values.append(expanded_layer)
         model_inputs["past_key_values"] = expanded_past_key_values
@@ -228,9 +176,8 @@ def staged_speculative_decoding(
         # draft model is equal to previous output of model
         check_all = input_ids[:, 1:] == selected_tokens[:, :-1]
         # hacky way to ensure that we "stop early" if False is found in check_all
-        # avoids out of bounds error due to padding input_ids above
-        valid_indices = torch.cumsum(check_all, dim=1) * torch.cumprod(check_all, dim=1)
-        valid_indices = torch.max(valid_indices, dim=1).values
+        check_cum = torch.cumsum(check_all, dim=1) * torch.cumprod(check_all, dim=1)
+        valid_indices = torch.max(check_cum, dim=1).values
 
         # choose the best valid index and find number of tokens generated
         chosen_index = valid_indices.argmax().item()
@@ -251,9 +198,17 @@ def staged_speculative_decoding(
         inputs["input_ids"] = torch.cat([last_input_token, last_token], dim=1)
         inputs["attention_mask"] = attention_mask[:, :total_length]
 
-        # index tree traversal by [chosen_index, depth] to get chosen_past_key_values
-        tree_past_key_values = get_tree_past_key_values(tree.root)
-        chosen_past_key_values = tree_past_key_values[chosen_index][num_generated - 1]
+        # TODO (Rohan138): Everything is broken lol
+        breakpoint()
+
+        tree_index = chosen_index // (topk ** (num_tokens - num_generated + 1))
+        chosen_past_key_values = []
+        for layer in tree_past_key_values[num_generated - 1]:
+            chosen_layer = []
+            for item in layer:
+                chosen_item = item[None, tree_index, :, :]
+                chosen_layer.append(chosen_item)
+            chosen_past_key_values.append(chosen_layer)
         inputs["past_key_values"] = chosen_past_key_values
 
         # update model past_key_values for next iteration
