@@ -1,18 +1,431 @@
-ssd_generation staged_assisted_decoding:47        :42.0   Mb :1049.2 Mb     # Assistant: initialize assistant-related variables
-ssd_generation staged_assisted_decoding:226       :66.0   Mb :1115.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1117.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :4.0    Mb :1121.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :6.0    Mb :1127.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :6.0    Mb :1133.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :4.0    Mb :1137.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :6.0    Mb :1143.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :6.0    Mb :1149.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1151.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1153.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1155.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1157.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1159.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1161.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :6.0    Mb :1167.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :6.0    Mb :1173.2 Mb                 "assistant_past_key_values"
-ssd_generation staged_assisted_decoding:226       :2.0    Mb :1175.2 Mb                 "assistant_past_key_values"
+ssd_generation staged_assisted_decoding:39        :42.0   Mb :1049.2 Mb     to enable staged speculative decoding"""
+ssd_generation staged_assisted_decoding:91        :86.0   Mb :1135.2 Mb     model_outputs = self(**model_inputs, use_cache=True)
+ssd_generation staged_assisted_decoding:110       :26.0   Mb :1161.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :2.0    Mb :1163.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :20.0   Mb :1183.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :60.0   Mb :1243.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1255.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1267.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1279.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1291.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1303.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1315.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1327.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1339.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1351.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1363.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :1375.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :108.0  Mb :1483.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1515.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1547.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1579.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1611.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1643.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1675.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1707.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1739.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1771.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1803.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1835.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :1867.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2374.0 Mb :4241.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-134.0 Mb :4107.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :4113.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2326.0 Mb :6439.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-676.0 Mb :5763.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :5769.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5781.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5793.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5805.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5817.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5829.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5841.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5853.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5865.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5877.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5889.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5901.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :5913.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :108.0  Mb :6021.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6053.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6085.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6117.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6149.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6181.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6213.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6245.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6277.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6309.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6341.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6373.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :32.0   Mb :6405.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :384.0  Mb :6789.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :6885.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :6981.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7077.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7173.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7269.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7365.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7461.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7557.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7653.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7749.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7845.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :96.0   Mb :7941.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2444.0 Mb :10385.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-1732.0Mb :8653.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :8659.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :8757.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :8855.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :8953.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9051.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9149.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9247.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9345.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9443.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9541.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9639.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9737.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :98.0   Mb :9835.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2492.0 Mb :12327.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-4406.0Mb :7921.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :7927.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8027.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8127.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8227.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8327.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8427.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8527.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8627.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8727.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8827.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :8927.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :9027.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :100.0  Mb :9127.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2540.0 Mb :11667.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3564.0Mb :8103.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :8109.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2448.0 Mb :10557.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-4376.0Mb :6181.2 Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :6189.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2448.0 Mb :8637.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-2502.0Mb :6135.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :6141.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :2.0    Mb :6143.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:132       :20.0   Mb :6163.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6175.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6187.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6199.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6211.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6223.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6235.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6247.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6259.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6271.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6283.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6295.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6307.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2498.0 Mb :8805.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-1254.0Mb :7551.2 Mb 
+ssd_generation staged_assisted_decoding:110       :4.0    Mb :7555.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :72.0   Mb :7627.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :7733.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :7839.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :7945.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8051.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8157.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8263.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8369.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8475.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8581.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8687.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8793.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :106.0  Mb :8899.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2684.0 Mb :11583.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3080.0Mb :8503.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :8509.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :1272.0 Mb :9781.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3290.0Mb :6491.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :6497.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6509.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6521.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6533.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6545.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6557.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :12.0   Mb :6569.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2592.0 Mb :9161.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-1452.0Mb :7709.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :7715.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2592.0 Mb :10307.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3882.0Mb :6425.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :6431.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2640.0 Mb :9071.2 Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-2634.0Mb :6437.2 Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :6445.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :40.0   Mb :6485.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6499.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6513.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6527.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6541.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6555.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6569.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6583.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6597.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6611.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6625.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6639.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6653.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :126.0  Mb :6779.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :6817.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :6855.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :6893.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :6931.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :6969.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7007.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7045.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7083.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7121.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7159.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7197.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7235.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :456.0  Mb :7691.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :7801.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :7911.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8021.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8131.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8241.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8351.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8461.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8571.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8681.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8791.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :8901.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :110.0  Mb :9011.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2828.0 Mb :11839.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3222.0Mb :8617.2 Mb 
+ssd_generation staged_assisted_decoding:110       :4.0    Mb :8621.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2854.0 Mb :11475.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3954.0Mb :7521.2 Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :7529.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7567.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7605.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7643.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7681.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7719.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :38.0   Mb :7757.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2854.0 Mb :10611.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-2022.0Mb :8589.2 Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :8597.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2668.0 Mb :11265.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-4536.0Mb :6729.2 Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :6737.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :60.0   Mb :6797.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6811.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6825.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6839.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6853.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6867.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6881.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6895.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6909.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6923.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6937.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6951.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :6965.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :126.0  Mb :7091.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7131.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7171.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7211.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7251.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7291.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7331.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7371.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7411.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7451.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7491.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7531.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :7571.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :482.0  Mb :8053.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8171.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8289.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8407.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8525.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8643.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8761.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8879.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :8997.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :9115.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :9233.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :9351.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :118.0  Mb :9469.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2972.0 Mb :12441.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3388.0Mb :9053.2 Mb 
+ssd_generation staged_assisted_decoding:110       :2.0    Mb :9055.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2880.0 Mb :11935.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3842.0Mb :8093.2 Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :8101.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :8141.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :40.0   Mb :8181.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :2928.0 Mb :11109.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3014.0Mb :8095.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :8101.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :2930.0 Mb :11031.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3958.0Mb :7073.2 Mb 
+ssd_generation staged_assisted_decoding:110       :6.0    Mb :7079.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :40.0   Mb :7119.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7133.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7147.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7161.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7175.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7189.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7203.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7217.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7231.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7245.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7259.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7273.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :14.0   Mb :7287.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :140.0  Mb :7427.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7469.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7511.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7553.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7595.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7637.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7679.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7721.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7763.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7805.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7847.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7889.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :42.0   Mb :7931.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :506.0  Mb :8437.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :8561.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :8685.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :8809.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :8933.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9057.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9181.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9305.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9429.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9553.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9677.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9801.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :124.0  Mb :9925.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :3116.0 Mb :13041.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-2262.0Mb :10779.2Mb 
+ssd_generation staged_assisted_decoding:110       :4.0    Mb :10783.2Mb         )
+ssd_generation staged_assisted_decoding:221       :3024.0 Mb :13807.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-5608.0Mb :8199.2 Mb 
+ssd_generation staged_assisted_decoding:110       :10.0   Mb :8209.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8253.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8297.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8341.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8385.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8429.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8473.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8517.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :3072.0 Mb :11589.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3188.0Mb :8401.2 Mb 
+ssd_generation staged_assisted_decoding:110       :10.0   Mb :8411.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :3072.0 Mb :11483.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-4116.0Mb :7367.2 Mb 
+ssd_generation staged_assisted_decoding:110       :10.0   Mb :7377.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :60.0   Mb :7437.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7453.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7469.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7485.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7501.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7517.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7533.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7549.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7565.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7581.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7597.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7613.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7629.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :144.0  Mb :7773.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :7817.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :7861.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :7905.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :7949.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :7993.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8037.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8081.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8125.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8169.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8213.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8257.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :44.0   Mb :8301.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :530.0  Mb :8831.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :8961.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9091.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9221.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9351.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9481.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9611.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9741.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :9871.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :10001.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :10131.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :10261.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :130.0  Mb :10391.2Mb                     )
+ssd_generation staged_assisted_decoding:221       :3260.0 Mb :13651.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3798.0Mb :9853.2 Mb 
+ssd_generation staged_assisted_decoding:110       :4.0    Mb :9857.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :3168.0 Mb :13025.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-4458.0Mb :8567.2 Mb 
+ssd_generation staged_assisted_decoding:110       :10.0   Mb :8577.2 Mb         )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8623.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8669.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8715.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8761.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8807.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8853.2 Mb                     )
+ssd_generation staged_assisted_decoding:221       :3216.0 Mb :12069.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3050.0Mb :9019.2 Mb 
+ssd_generation staged_assisted_decoding:110       :10.0   Mb :9029.2 Mb         )
+ssd_generation staged_assisted_decoding:221       :3216.0 Mb :12245.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-4582.0Mb :7663.2 Mb 
+ssd_generation staged_assisted_decoding:110       :10.0   Mb :7673.2 Mb         )
+ssd_generation staged_assisted_decoding:132       :60.0   Mb :7733.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7749.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7765.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7781.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7797.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7813.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7829.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7845.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7861.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7877.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7893.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :16.0   Mb :7909.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :144.0  Mb :8053.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8099.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8145.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8191.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8237.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8283.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8329.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8375.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8421.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8467.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8513.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8559.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :46.0   Mb :8605.2 Mb                     )
+ssd_generation staged_assisted_decoding:132       :552.0  Mb :9157.2 Mb             # 1.2. greedily select the next candidate token
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :9293.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :9429.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :9565.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :9701.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :9837.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :9973.2 Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :10109.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :10245.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :10381.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :10517.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :10653.2Mb                     )
+ssd_generation staged_assisted_decoding:153       :136.0  Mb :10789.2Mb                     )
+ssd_generation staged_assisted_decoding:221       :3404.0 Mb :14193.2Mb         # 2.3. Process the new logits
+ssd_generation staged_assisted_decoding:94        :-3952.0Mb :10241.2Mb 
+ssd_generation staged_assisted_decoding:110       :8.0    Mb :10249.2Mb         )
+ssd_generation staged_assisted_decoding:221       :3312.0 Mb :13561.2Mb         # 2.3. Process the new logits

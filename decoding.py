@@ -35,11 +35,7 @@ def speculative_decoding(
         kwargs = {"do_sample": False}
     draft_model.generation_config.num_assistant_tokens = num_tokens
     # See https://huggingface.co/blog/assisted-generation
-    # if n_matches == int(num_assistant_tokens):
-    #     num_assistant_tokens += 2.0
-    # else:
-    #     num_assistant_tokens = max(1.0, num_assistant_tokens - 1.0)
-    draft_model.generation_config.num_assistant_tokens_schedule = None  # "heuristic"
+    draft_model.generation_config.num_assistant_tokens_schedule = "heuristic"
     return model.generate(
         **inputs,
         max_new_tokens=GEN_LENGTH,
@@ -59,11 +55,7 @@ def staged_speculative_decoding(
     draft_model.generation_config.num_assistant_tokens = num_tokens
     draft_model.generation_config.topk_tokens = topk
     # See https://huggingface.co/blog/assisted-generation
-    # if n_matches == int(num_assistant_tokens):
-    #     num_assistant_tokens += 2.0
-    # else:
-    #     num_assistant_tokens = max(1.0, num_assistant_tokens - 1.0)
-    draft_model.generation_config.num_assistant_tokens_schedule = None  # "heuristic"
+    draft_model.generation_config.num_assistant_tokens_schedule = "heuristic"
     model.assisted_decoding = MethodType(staged_assisted_decoding, model)
     return model.generate(
         **inputs,

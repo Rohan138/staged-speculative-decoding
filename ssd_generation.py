@@ -105,7 +105,7 @@ def staged_assisted_decoding(
         # TODO (Rohan138): This is inefficient; find a better way!
         assistant_model_outputs = assistant_model(
             candidate_input_ids[:, :-1],
-            past_key_values=model_kwargs.get("assistant_past_key_values", None),
+            past_key_values=model_kwargs.pop("assistant_past_key_values", None),
         )
         assistant_past_key_values = assistant_model_outputs.past_key_values
 
@@ -267,9 +267,9 @@ def staged_assisted_decoding(
             == "heuristic"
         ):
             if n_matches == int(num_assistant_tokens):
-                num_assistant_tokens += 2.0
+                num_assistant_tokens += 2
             else:
-                num_assistant_tokens = max(1.0, num_assistant_tokens - 1.0)
+                num_assistant_tokens = max(1, num_assistant_tokens - 1)
 
         # 6.2. Update candidate_input_ids
         last_input_token = tree_input_ids[chosen_index, n_matches]
@@ -281,17 +281,7 @@ def staged_assisted_decoding(
         mask = torch.cat([mask, mask.new_ones((mask.shape[0], n_matches))], dim=-1)
         model_kwargs["attention_mask"] = mask
 
-        # 6.4. Update past_key_values
-        chosen_model_past_key_values = []
-        for layer in model_outputs.past_key_values:
-            chosen_layer = []
-            for item in layer:
-                chosen_item = item[None, chosen_index, :, : cur_len - 1]
-                chosen_layer.append(chosen_item)
-            chosen_model_past_key_values.append(chosen_layer)
-        model_past_key_values = chosen_model_past_key_values
-
-        # 6.5. Update assistant_past_key_values
+        # 6.4. Update assistant_past_key_values
         tree_index = chosen_index // (topk_tokens ** (num_assistant_tokens - n_matches))
         chosen_past_key_values = []
         for layer in tree_past_key_values[n_matches]:
@@ -300,7 +290,17 @@ def staged_assisted_decoding(
                 chosen_item = item[None, tree_index, :, :]
                 chosen_layer.append(chosen_item)
             chosen_past_key_values.append(chosen_layer)
-        assistant_past_key_values = chosen_past_key_values
+        model_kwargs["assistant_past_key_values"] = chosen_past_key_values
+
+        # 6.5. Update past_key_values
+        chosen_model_past_key_values = []
+        for layer in model_outputs.past_key_values:
+            chosen_layer = []
+            for item in layer:
+                chosen_item = item[None, chosen_index, :, : cur_len - 1]
+                chosen_layer.append(chosen_item)
+            chosen_model_past_key_values.append(chosen_layer)
+        model_past_key_values = chosen_model_past_key_values
 
         # 6.6. Explicitly free up unused memory before next iteration
         torch.cuda.empty_cache()
