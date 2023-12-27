@@ -304,7 +304,7 @@ def staged_assisted_decoding(
 
         # 6.6. Explicitly free up unused memory before next iteration
         torch.cuda.empty_cache()
-    
+
     if streamer is not None:
         streamer.end()
 
