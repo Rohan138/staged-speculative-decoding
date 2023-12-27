@@ -259,29 +259,17 @@ def staged_assisted_decoding(
             break
 
         # 6. Update values for next iteration
-        # 6.1. Adjust the max number of assistant tokens to use in the next iteration. This is a simple heuristic,
-        # probably can be improved -- we want to balance the benefits of getting assistant tokens correct with the
-        # cost of forecasting incorrect assistant tokens.
-        if (
-            assistant_model.generation_config.num_assistant_tokens_schedule
-            == "heuristic"
-        ):
-            if n_matches == int(num_assistant_tokens):
-                num_assistant_tokens += 2
-            else:
-                num_assistant_tokens = max(1, num_assistant_tokens - 1)
-
-        # 6.2. Update candidate_input_ids
+        # 6.1. Update candidate_input_ids
         last_input_token = tree_input_ids[chosen_index, n_matches]
         last_input_token = last_input_token.reshape(1, 1)
         candidate_input_ids = torch.cat([last_input_token, last_token], dim=1)
 
-        # 6.3. Update attention mask
+        # 6.2. Update attention mask
         mask = model_kwargs["attention_mask"]
         mask = torch.cat([mask, mask.new_ones((mask.shape[0], n_matches))], dim=-1)
         model_kwargs["attention_mask"] = mask
 
-        # 6.4. Update assistant_past_key_values
+        # 6.3. Update assistant_past_key_values
         tree_index = chosen_index // (topk_tokens ** (num_assistant_tokens - n_matches))
         chosen_past_key_values = []
         for layer in tree_past_key_values[n_matches]:
@@ -292,7 +280,7 @@ def staged_assisted_decoding(
             chosen_past_key_values.append(chosen_layer)
         model_kwargs["assistant_past_key_values"] = chosen_past_key_values
 
-        # 6.5. Update past_key_values
+        # 6.4. Update past_key_values
         chosen_model_past_key_values = []
         for layer in model_outputs.past_key_values:
             chosen_layer = []
@@ -301,6 +289,18 @@ def staged_assisted_decoding(
                 chosen_layer.append(chosen_item)
             chosen_model_past_key_values.append(chosen_layer)
         model_past_key_values = chosen_model_past_key_values
+
+        # 6.5. Adjust the max number of assistant tokens to use in the next iteration. This is a simple heuristic,
+        # probably can be improved -- we want to balance the benefits of getting assistant tokens correct with the
+        # cost of forecasting incorrect assistant tokens.
+        if (
+            assistant_model.generation_config.num_assistant_tokens_schedule
+            == "heuristic"
+        ):
+            if n_matches == int(num_assistant_tokens):
+                num_assistant_tokens += 2
+            else:
+                num_assistant_tokens = max(1, num_assistant_tokens - 1)
 
         # 6.6. Explicitly free up unused memory before next iteration
         torch.cuda.empty_cache()
