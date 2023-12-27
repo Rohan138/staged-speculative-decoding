@@ -4,10 +4,8 @@ from typing import TYPE_CHECKING, List, Optional, Union
 
 import einops
 import torch
-import torch.distributed as dist
 from transformers.generation.logits_process import LogitsProcessorList
 from transformers.generation.stopping_criteria import StoppingCriteriaList
-from transformers.generation.utils import _crop_past_key_values, _split_model_outputs
 from transformers.utils import logging
 
 if TYPE_CHECKING:
@@ -91,6 +89,7 @@ def staged_assisted_decoding(
     }
     model_outputs = self(**model_inputs, use_cache=True)
     model_past_key_values = model_outputs.past_key_values
+    candidate_input_ids = input_ids
 
     while True:
         # Assistant: main logic start
@@ -99,7 +98,6 @@ def staged_assisted_decoding(
         #  1. Forecast next N tokens using the assistant model. This `for` block can be replaced with a
         # `.generate()` call if we decide to add `past_key_values` as a possible output of generate, as we
         # need access to the assistant cache to secure strong speedups.
-        candidate_input_ids = input_ids
 
         # Generate initial kv cache for assistant model
         # currently need to rerun this every iteration because last token
