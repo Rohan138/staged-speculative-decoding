@@ -1,18 +1,13 @@
 import copy
 import inspect
-import warnings
 from typing import TYPE_CHECKING, List, Optional, Union
 
+import einops
 import torch
 import torch.distributed as dist
 from transformers.generation.logits_process import LogitsProcessorList
 from transformers.generation.stopping_criteria import StoppingCriteriaList
-from transformers.generation.utils import (
-    GreedySearchDecoderOnlyOutput,
-    GreedySearchEncoderDecoderOutput,
-    _crop_past_key_values,
-    _split_model_outputs,
-)
+from transformers.generation.utils import _crop_past_key_values, _split_model_outputs
 from transformers.utils import logging
 
 if TYPE_CHECKING:
@@ -43,6 +38,10 @@ def staged_assisted_decoding(
 ):
     """Override `transformers.generation.utils.GenerationMixin.assisted_decoding`
     to enable staged speculative decoding"""
+    if self.config.is_encoder_decoder or assistant_model.config.is_encoder_decoder:
+        raise ValueError(
+            "encoder_decoder not supprted yet for staged_assisted_decoding"
+        )
     # Assistant: initialize assistant-related variables
     num_assistant_tokens = assistant_model.generation_config.num_assistant_tokens
     topk_tokens = assistant_model.generation_config.topk_tokens
@@ -51,6 +50,10 @@ def staged_assisted_decoding(
     assistant_accepts_encoder_outputs = "encoder_outputs" in set(
         inspect.signature(assistant_model.forward).parameters.keys()
     )
+    if assistant_accepts_encoder_outputs:
+        raise ValueError(
+            "encoder_outputs not supported yet for staged_assisted_decoding"
+        )
 
     # init values
     logits_processor = (
@@ -76,84 +79,20 @@ def staged_assisted_decoding(
         raise ValueError(
             "If `eos_token_id` is defined, make sure that `pad_token_id` is defined."
         )
-    if isinstance(eos_token_id, int):
-        eos_token_id = [eos_token_id]
-    eos_token_id_tensor = (
-        torch.tensor(eos_token_id).to(input_ids.device)
-        if eos_token_id is not None
-        else None
-    )
-    output_scores = (
-        output_scores
-        if output_scores is not None
-        else self.generation_config.output_scores
-    )
-    output_attentions = (
-        output_attentions
-        if output_attentions is not None
-        else self.generation_config.output_attentions
-    )
-    output_hidden_states = (
-        output_hidden_states
-        if output_hidden_states is not None
-        else self.generation_config.output_hidden_states
-    )
-    return_dict_in_generate = (
-        return_dict_in_generate
-        if return_dict_in_generate is not None
-        else self.generation_config.return_dict_in_generate
-    )
-
-    # init attention / hidden states / scores tuples
-    scores = () if (return_dict_in_generate and output_scores) else None
-    decoder_attentions = () if (return_dict_in_generate and output_attentions) else None
-    cross_attentions = () if (return_dict_in_generate and output_attentions) else None
-    decoder_hidden_states = (
-        () if (return_dict_in_generate and output_hidden_states) else None
-    )
-
-    # if model is an encoder-decoder, retrieve encoder attention weights and hidden states
-    if return_dict_in_generate and self.config.is_encoder_decoder:
-        encoder_attentions = (
-            model_kwargs["encoder_outputs"].get("attentions")
-            if output_attentions
-            else None
-        )
-        encoder_hidden_states = (
-            model_kwargs["encoder_outputs"].get("hidden_states")
-            if output_hidden_states
-            else None
-        )
-
-    # keep track of which sequences are already finished
-    unfinished_sequences = input_ids.new(input_ids.shape[0]).fill_(1)
 
     # other auxiliary variables
     max_len = stopping_criteria[0].max_length
-    assistant_kv_indexing = (
-        1
-        if "bloom" in assistant_model.__class__.__name__.lower()
-        or (
-            assistant_model.config.architectures is not None
-            and "bloom" in assistant_model.config.architectures[0].lower()
-        )
-        else 0
-    )
 
-    this_peer_finished = False  # used by synced_gpus only
+    # Generate initial kv cache for model
+    model_inputs = {
+        "input_ids": input_ids[:, :-1],
+        "attention_mask": model_kwargs["attention_mask"][:, :-1],
+        "past_key_values": None,
+    }
+    model_outputs = self(**model_inputs, use_cache=True)
+    model_past_key_values = model_outputs.past_key_values
+
     while True:
-        if synced_gpus:
-            # Under synced_gpus the `forward` call must continue until all gpus complete their sequence.
-            # The following logic allows an early break if all peers finished generating their sequence
-            this_peer_finished_flag = torch.tensor(
-                0.0 if this_peer_finished else 1.0
-            ).to(input_ids.device)
-            # send 0.0 if we finished, 1.0 otherwise
-            dist.all_reduce(this_peer_finished_flag, op=dist.ReduceOp.SUM)
-            # did all peers finish? the reduced sum will be 0.0 then
-            if this_peer_finished_flag.item() == 0.0:
-                break
-
         # Assistant: main logic start
         cur_len = input_ids.shape[-1]
 
@@ -161,88 +100,80 @@ def staged_assisted_decoding(
         # `.generate()` call if we decide to add `past_key_values` as a possible output of generate, as we
         # need access to the assistant cache to secure strong speedups.
         candidate_input_ids = input_ids
-        for _ in range(int(num_assistant_tokens)):
-            # 1.1. use the assistant model to obtain the next candidate logits
-            if "assistant_past_key_values" in model_kwargs:
-                prev_seq_len = model_kwargs["assistant_past_key_values"][0][
-                    assistant_kv_indexing
-                ].shape[-2]
-                # `new_token_len` can be 1 or 2 (next token in assistant + last token picked by the larger model)
-                new_token_len = candidate_input_ids.shape[1] - prev_seq_len
-                assist_inputs = candidate_input_ids[:, -new_token_len:]
-                # TODO (joao): make it compatible with models that use unconventional fwd pass logic, like blip2
-                if assistant_model.config.is_encoder_decoder:
-                    assistant_model_outputs = assistant_model(
-                        decoder_input_ids=assist_inputs,
-                        past_key_values=model_kwargs["assistant_past_key_values"],
-                        encoder_outputs=model_kwargs["assistant_encoder_outputs"],
-                    )
-                else:
-                    encoder_kwargs = {}
 
-                    if (
-                        assistant_accepts_encoder_outputs
-                        and "assistant_encoder_outputs" in model_kwargs
-                    ):
-                        encoder_kwargs["encoder_outputs"] = model_kwargs[
-                            "assistant_encoder_outputs"
-                        ]
+        # Generate initial kv cache for assistant model
+        # currently need to rerun this every iteration because last token
+        # is generated by model and does not have a corresponding kv cache
+        # TODO (Rohan138): This is inefficient; find a better way!
+        assistant_model_outputs = assistant_model(
+            candidate_input_ids[:, :-1],
+            past_key_values=model_kwargs.get("assistant_past_key_values", None),
+        )
+        assistant_past_key_values = assistant_model_outputs.past_key_values
 
-                    assistant_model_outputs = assistant_model(
-                        assist_inputs,
-                        past_key_values=model_kwargs["assistant_past_key_values"],
-                        **encoder_kwargs,
-                    )
-            else:
-                if assistant_model.config.is_encoder_decoder:
-                    assistant_model_outputs = assistant_model(
-                        decoder_input_ids=candidate_input_ids,
-                        encoder_outputs=model_kwargs["assistant_encoder_outputs"],
-                    )
-                else:
-                    encoder_kwargs = {}
+        # Build staged speculative decoding tree
+        tree_input_ids = []
+        tree_past_key_values = []
 
-                    if (
-                        assistant_accepts_encoder_outputs
-                        and "assistant_encoder_outputs" in model_kwargs
-                    ):
-                        encoder_kwargs["encoder_outputs"] = model_kwargs[
-                            "assistant_encoder_outputs"
-                        ]
+        tree_input_ids.append(
+            einops.repeat(
+                candidate_input_ids[:, -1:],
+                "b ... -> (b k) ...",
+                k=topk_tokens**num_assistant_tokens,
+            )
+        )
+        tree_past_key_values.append(assistant_past_key_values)
 
-                    assistant_model_outputs = assistant_model(
-                        candidate_input_ids, **encoder_kwargs
-                    )
+        for depth in range(int(num_assistant_tokens)):
+            assistant_model_outputs = assistant_model(
+                candidate_input_ids[:, -1:],
+                past_key_values=assistant_past_key_values,
+            )
 
             # 1.2. greedily select the next candidate token
-            model_kwargs[
-                "assistant_past_key_values"
-            ] = assistant_model_outputs.past_key_values
             if len(logits_processor) > 0:
                 assistant_model_outputs.logits[:, -1, :] = logits_processor(
                     candidate_input_ids, assistant_model_outputs.logits[:, -1, :]
                 )
-            new_token = assistant_model_outputs.logits[:, -1, :].argmax(dim=-1)
-            candidate_input_ids = torch.cat(
-                (candidate_input_ids, new_token[:, None]), dim=-1
+            next_token_logits = assistant_model_outputs.logits[:, -1, :]
+            if do_sample:
+                next_token_logits = (
+                    next_token_logits / assistant_model.config.temperature
+                )
+
+            _, next_token_ids = next_token_logits.topk(topk_tokens, dim=-1)
+
+            candidate_input_ids = next_token_ids.reshape(-1, 1)
+
+            expanded_past_key_values = []
+            for layer in assistant_model_outputs.past_key_values:
+                expanded_layer = []
+                for item in layer:
+                    expanded_item = einops.repeat(
+                        item, "b ... -> (b k) ...", k=topk_tokens
+                    )
+                    expanded_layer.append(expanded_item)
+                expanded_past_key_values.append(expanded_layer)
+            assistant_past_key_values = expanded_past_key_values
+
+            tree_input_ids.append(
+                einops.repeat(
+                    candidate_input_ids,
+                    "b ... -> (b k) ...",
+                    k=topk_tokens ** (num_assistant_tokens - depth - 1),
+                )
             )
+            tree_past_key_values.append(assistant_past_key_values)
 
             # 1.3. stop assistant generation on EOS
-            if eos_token_id_tensor is not None:
-                last_assistant_token_is_eos = new_token.tile(
-                    eos_token_id_tensor.shape[0], 1
-                )
-                last_assistant_token_is_eos = (
-                    ~last_assistant_token_is_eos.ne(eos_token_id_tensor.unsqueeze(1))
-                    .prod(dim=0)
-                    .bool()
-                )
-                if last_assistant_token_is_eos:
-                    break
-            else:
-                last_assistant_token_is_eos = False
+            # TODO (Rohan138): Handle eos_token better; right now we early stop
+            # the depthwise generation of the whole tree if eos_token is found
+            last_assistant_token_is_eos = (candidate_input_ids == eos_token_id).any()
+            if last_assistant_token_is_eos:
+                break
 
-        candidate_length = candidate_input_ids.shape[1] - input_ids.shape[1]
+        tree_input_ids = torch.cat(tree_input_ids, dim=1)
+        candidate_length = tree_input_ids.shape[1]
 
         # 2. Use the original model to obtain the next token logits given the candidate sequence. We obtain
         # `candidate_length + 1` relevant logits from this process: in the event that all candidates are correct,
@@ -251,83 +182,86 @@ def staged_assisted_decoding(
         # 2.1. Prepare the model inputs
         candidate_kwargs = copy.copy(model_kwargs)
         candidate_kwargs = self._extend_attention_mask(
-            candidate_kwargs, candidate_input_ids.shape[1]
+            candidate_kwargs, cur_len + candidate_length - 1
         )
         candidate_kwargs = self._extend_token_type_ids(
-            candidate_kwargs, candidate_input_ids.shape[1]
+            candidate_kwargs, cur_len + candidate_length - 1
         )
+        attention_mask = candidate_kwargs["attention_mask"]
+        attention_mask = einops.repeat(
+            attention_mask, "b ... -> (b k) ...", k=tree_input_ids.shape[0]
+        )
+        candidate_kwargs["attention_mask"] = attention_mask
+        expanded_past_key_values = []
+        for layer in model_past_key_values:
+            expanded_layer = []
+            for item in layer:
+                expanded_item = einops.repeat(
+                    item, "b ... -> (b k) ...", k=tree_input_ids.shape[0]
+                )
+                expanded_layer.append(expanded_item)
+            expanded_past_key_values.append(expanded_layer)
+        candidate_kwargs["past_key_values"] = expanded_past_key_values
 
-        model_inputs = self.prepare_inputs_for_generation(
-            candidate_input_ids, **candidate_kwargs
+        position_ids = torch.arange(
+            cur_len, cur_len + candidate_length, device=input_ids.device
         )
+        position_ids = einops.repeat(
+            position_ids, "... -> k ...", k=tree_input_ids.shape[0]
+        )
+        candidate_kwargs["position_ids"] = position_ids
 
         # 2.2. Run a forward pass on the candidate sequence
-        outputs = self(
-            **model_inputs,
+        model_outputs = self(
+            tree_input_ids,
+            **candidate_kwargs,
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
         )
 
         # 2.3. Process the new logits
-        new_logits = outputs.logits[
-            :, -candidate_length - 1 :
-        ]  # excludes the input prompt if present
-        if len(logits_processor) > 0:
-            for i in range(candidate_length + 1):
-                new_logits[:, i, :] = logits_processor(
-                    candidate_input_ids[:, : cur_len + i], new_logits[:, i, :]
-                )
-        if len(logits_warper) > 0:
-            for i in range(candidate_length + 1):
-                new_logits[:, i, :] = logits_warper(
-                    candidate_input_ids[:, : cur_len + i], new_logits[:, i, :]
-                )
+        new_logits = model_outputs.logits
 
         # 3. Obtain the next tokens from the original model logits.
         if do_sample:
-            probs = new_logits.softmax(dim=-1)
-            selected_tokens = torch.multinomial(probs[0, :, :], num_samples=1).squeeze(
-                1
-            )[None, :]
+            new_logits = new_logits / self.generation_config.temperature
+            dist = torch.distributions.Categorical(logits=new_logits)
+            selected_tokens = dist.sample()
         else:
             selected_tokens = new_logits.argmax(dim=-1)
 
-        # 4. Compare the argmax from the original model logits with the assistant forecasted tokens. We can keep
-        # the assistant forecasted tokens until the first mismatch, or until the max length is reached.
-        candidate_new_tokens = candidate_input_ids[:, -candidate_length:]
-        n_matches = (
-            (~(candidate_new_tokens == selected_tokens[:, :-1])).cumsum(dim=-1) < 1
-        ).sum()
+        # 4. Compare the selected tokens with the assistant tokens
+        # 4.1. find valid indices where input token predicted by
+        # assistant model is equal to previous output of model
+        check_all = tree_input_ids[:, 1:] == selected_tokens[:, :-1]
+        # hacky way to ensure that we "stop early" if False is found in check_all
+        check_cum = torch.cumsum(check_all, dim=1) * torch.cumprod(check_all, dim=1)
+        valid_indices = torch.max(check_cum, dim=1).values
 
-        # 5. Update variables according to the number of matching assistant tokens. Remember: the token generated
-        # by the model after the last candidate match is also valid, as it is generated from a correct sequence.
-        # Because of this last token, assisted generation search reduces to a normal greedy search/sample if there
-        # is no match.
+        # 4.2 choose the best valid index and find number of matches
+        chosen_index = valid_indices.argmax().item()
+        n_matches = valid_indices[chosen_index].item()
 
-        # 5.1. Ensure we don't generate beyond max_len or an EOS token
+        # 5. Add newly generated tokens to input_ids
+        # 5.1. Ensure we don't generate beyond max_len or an eos token
         if last_assistant_token_is_eos and n_matches == candidate_length:
             n_matches -= 1
         n_matches = min(n_matches, max_len - cur_len - 1)
 
         # 5.2. Get the valid continuation, after the matching tokens
-        valid_tokens = selected_tokens[:, : n_matches + 1]
-        input_ids = torch.cat((input_ids, valid_tokens), dim=-1)
+        valid_tokens = selected_tokens[None, chosen_index, : n_matches + 1]
         if streamer is not None:
             streamer.put(valid_tokens.cpu())
-        new_cur_len = input_ids.shape[-1]
+        input_ids = torch.cat((input_ids, valid_tokens), dim=-1)
+        cur_len = input_ids.shape[-1]
+        last_token = valid_tokens[:, -1:]
 
-        # 5.3. Discard past key values relative to unused assistant tokens
-        new_cache_size = new_cur_len - 1
-        outputs.past_key_values = _crop_past_key_values(
-            self, outputs.past_key_values, new_cache_size
-        )
-        model_kwargs["assistant_past_key_values"] = _crop_past_key_values(
-            assistant_model,
-            model_kwargs["assistant_past_key_values"],
-            new_cache_size - 1,
-        )  # the assistant does not have the token after the last match, hence the -1
+        # 5.3. Terminate due to max_len or an eos token
+        if stopping_criteria(input_ids, None) or last_token == eos_token_id:
+            break
 
-        # 6. Adjust the max number of assistant tokens to use in the next iteration. This is a simple heuristic,
+        # 6. Update values for next iteration
+        # 6.1. Adjust the max number of assistant tokens to use in the next iteration. This is a simple heuristic,
         # probably can be improved -- we want to balance the benefits of getting assistant tokens correct with the
         # cost of forecasting incorrect assistant tokens.
         if (
@@ -339,98 +273,41 @@ def staged_assisted_decoding(
             else:
                 num_assistant_tokens = max(1.0, num_assistant_tokens - 1.0)
 
-        # Assistant: main logic end
-        if synced_gpus and this_peer_finished:
-            continue  # don't waste resources running the code we don't need
+        # 6.2. Update candidate_input_ids
+        last_input_token = tree_input_ids[chosen_index, n_matches]
+        last_input_token = last_input_token.reshape(1, 1)
+        candidate_input_ids = torch.cat([last_input_token, last_token], dim=1)
 
-        # Store scores, attentions and hidden_states when required
-        # Assistant: modified to append one tuple element per token, as in the other generation methods.
-        if return_dict_in_generate:
-            if output_scores:
-                scores += tuple(new_logits[:, i, :] for i in range(n_matches + 1))
+        # 6.3. Update attention mask
+        mask = model_kwargs["attention_mask"]
+        mask = torch.cat([mask, mask.new_ones((mask.shape[0], n_matches))], dim=-1)
+        model_kwargs["attention_mask"] = mask
 
-            if "past_key_values" not in model_kwargs:
-                added_len = new_cur_len
-            else:
-                added_len = n_matches + 1
+        # 6.4. Update past_key_values
+        chosen_model_past_key_values = []
+        for layer in model_outputs.past_key_values:
+            chosen_layer = []
+            for item in layer:
+                chosen_item = item[None, chosen_index, :, : cur_len - 1]
+                chosen_layer.append(chosen_item)
+            chosen_model_past_key_values.append(chosen_layer)
+        model_past_key_values = chosen_model_past_key_values
 
-            if output_attentions:
-                if self.config.is_encoder_decoder:
-                    cross_attentions = _split_model_outputs(
-                        cross_attentions, outputs.cross_attentions, cur_len, added_len
-                    )
-                    decoder_attentions = _split_model_outputs(
-                        decoder_attentions,
-                        outputs.decoder_attentions,
-                        cur_len,
-                        added_len,
-                        is_decoder_attention=True,
-                    )
-                else:
-                    decoder_attentions = _split_model_outputs(
-                        decoder_attentions,
-                        outputs.attentions,
-                        cur_len,
-                        added_len,
-                        is_decoder_attention=True,
-                    )
-            if output_hidden_states:
-                if self.config.is_encoder_decoder:
-                    decoder_hidden_states = _split_model_outputs(
-                        decoder_hidden_states,
-                        outputs.decoder_hidden_states,
-                        cur_len,
-                        added_len,
-                    )
-                else:
-                    decoder_hidden_states = _split_model_outputs(
-                        decoder_hidden_states, outputs.hidden_states, cur_len, added_len
-                    )
+        # 6.5. Update assistant_past_key_values
+        tree_index = chosen_index // (topk_tokens ** (num_assistant_tokens - n_matches))
+        chosen_past_key_values = []
+        for layer in tree_past_key_values[n_matches]:
+            chosen_layer = []
+            for item in layer:
+                chosen_item = item[None, tree_index, :, :]
+                chosen_layer.append(chosen_item)
+            chosen_past_key_values.append(chosen_layer)
+        assistant_past_key_values = chosen_past_key_values
 
-        model_kwargs = self._update_model_kwargs_for_generation(
-            outputs, model_kwargs, is_encoder_decoder=self.config.is_encoder_decoder
-        )
-
-        # if eos_token was found in one sentence, set sentence to finished
-        if eos_token_id_tensor is not None:
-            unfinished_sequences = unfinished_sequences.mul(
-                input_ids[:, -1]
-                .tile(eos_token_id_tensor.shape[0], 1)
-                .ne(eos_token_id_tensor.unsqueeze(1))
-                .prod(dim=0)
-            )
-
-            # stop when each sentence is finished
-            if unfinished_sequences.max() == 0:
-                this_peer_finished = True
-
-        # stop if we exceed the maximum length
-        if stopping_criteria(input_ids, scores):
-            this_peer_finished = True
-
-        if this_peer_finished and not synced_gpus:
-            break
-
+        # 6.6. Explicitly free up unused memory before next iteration
+        torch.cuda.empty_cache()
+    
     if streamer is not None:
         streamer.end()
 
-    if return_dict_in_generate:
-        if self.config.is_encoder_decoder:
-            return GreedySearchEncoderDecoderOutput(
-                sequences=input_ids,
-                scores=scores,
-                encoder_attentions=encoder_attentions,
-                encoder_hidden_states=encoder_hidden_states,
-                decoder_attentions=decoder_attentions,
-                cross_attentions=cross_attentions,
-                decoder_hidden_states=decoder_hidden_states,
-            )
-        else:
-            return GreedySearchDecoderOnlyOutput(
-                sequences=input_ids,
-                scores=scores,
-                attentions=decoder_attentions,
-                hidden_states=decoder_hidden_states,
-            )
-    else:
-        return input_ids
+    return input_ids
