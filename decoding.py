@@ -162,6 +162,12 @@ def staged_speculative_decoding(
             expanded_past_key_values.append(expanded_layer)
         model_inputs["past_key_values"] = expanded_past_key_values
 
+        position_ids = torch.arange(
+            total_length, total_length + input_ids.shape[1], device=input_ids.device
+        )
+        position_ids = einops.repeat(position_ids, "... -> k ...", k=input_ids.shape[0])
+        model_inputs["position_ids"] = position_ids
+
         model_outputs = model(**model_inputs, use_cache=True)
         new_logits = model_outputs.logits
 
@@ -189,7 +195,14 @@ def staged_speculative_decoding(
         last_token = chosen_tokens[:, -1:]
         total_length += num_generated
 
-        if last_token == eos_token_id or total_length >= INP_LENGTH + GEN_LENGTH:
+        is_eos_token = output_sequence == eos_token_id
+        if is_eos_token.any() or total_length >= INP_LENGTH + GEN_LENGTH:
+            # Find the index of the first eos token in output_sequence
+            eos_index = torch.nonzero(is_eos_token)[0][1].item()
+            output_sequence = output_sequence[:, :eos_index + 1]
+            output_sequence = output_sequence[
+                :, : min(total_length, INP_LENGTH + GEN_LENGTH)
+            ]
             break
 
         # update draft model inputs for next iteration
@@ -197,9 +210,6 @@ def staged_speculative_decoding(
         last_input_token = last_input_token.reshape(1, 1)
         inputs["input_ids"] = torch.cat([last_input_token, last_token], dim=1)
         inputs["attention_mask"] = attention_mask[:, :total_length]
-
-        # TODO (Rohan138): Everything is broken lol
-        breakpoint()
 
         tree_index = chosen_index // (topk ** (num_tokens - num_generated + 1))
         chosen_past_key_values = []
@@ -224,7 +234,7 @@ def staged_speculative_decoding(
         # explicitly free up unused memory before next iteration
         torch.cuda.empty_cache()
 
-    return output_sequence[:, : min(output_sequence.shape[1], INP_LENGTH + GEN_LENGTH)]
+    return output_sequence
 
 
 def generate(
