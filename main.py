@@ -47,7 +47,13 @@ def parse_args():
 
 def get_dataset(dataset_name: str, num_samples: int):
     if "c4" in dataset_name:
-        dataset = load_dataset(dataset_name, "en", split="validation", streaming=True)
+        dataset = load_dataset(
+            dataset_name,
+            "en",
+            split="validation",
+            streaming=True,
+            trust_remote_code=True,
+        )
         dataset = dataset.take(num_samples)
         dataset = Dataset.from_generator(lambda: dataset)
         return dataset["text"]

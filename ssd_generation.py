@@ -6,6 +6,10 @@ import einops
 import torch
 from transformers.generation.logits_process import LogitsProcessorList
 from transformers.generation.stopping_criteria import StoppingCriteriaList
+from transformers.generation.utils import (
+    _prepare_attention_mask,
+    _prepare_token_type_ids,
+)
 from transformers.utils import logging
 
 if TYPE_CHECKING:
@@ -179,11 +183,13 @@ def staged_assisted_decoding(
 
         # 2.1. Prepare the model inputs
         candidate_kwargs = copy.copy(model_kwargs)
-        candidate_kwargs = self._extend_attention_mask(
-            candidate_kwargs, cur_len + candidate_length - 1
+        candidate_kwargs = _prepare_attention_mask(
+            candidate_kwargs,
+            candidate_input_ids.shape[1],
+            self.config.is_encoder_decoder,
         )
-        candidate_kwargs = self._extend_token_type_ids(
-            candidate_kwargs, cur_len + candidate_length - 1
+        candidate_kwargs = _prepare_token_type_ids(
+            candidate_kwargs, candidate_input_ids.shape[1]
         )
         attention_mask = candidate_kwargs["attention_mask"]
         attention_mask = einops.repeat(
