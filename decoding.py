@@ -109,7 +109,7 @@ def staged_speculative_decoding(
 
             # Update draft inputs for next iteration
             # Fold leaf tokens into batch dimension
-            next_token_ids = next_token_ids.reshape(-1, 1)
+            next_token_ids = next_token_ids.view(-1, 1)
             draft_inputs["input_ids"] = next_token_ids
             draft_inputs["attention_mask"] = einops.repeat(
                 attention_mask, "b ... -> (b k) ...", k=topk
@@ -196,10 +196,12 @@ def staged_speculative_decoding(
         total_length += num_generated
 
         is_eos_token = output_sequence == eos_token_id
-        if is_eos_token.any() or total_length >= INP_LENGTH + GEN_LENGTH:
+        if is_eos_token.any():
             # Find the index of the first eos token in output_sequence
-            eos_index = torch.nonzero(is_eos_token)[0][1].item()
-            output_sequence = output_sequence[:, :eos_index + 1]
+            eos_index = torch.nonzero(is_eos_token)[0, 1].item()
+            output_sequence = output_sequence[:, : eos_index + 1]
+            break
+        if total_length >= INP_LENGTH + GEN_LENGTH:
             output_sequence = output_sequence[
                 :, : min(total_length, INP_LENGTH + GEN_LENGTH)
             ]
@@ -207,7 +209,7 @@ def staged_speculative_decoding(
 
         # update draft model inputs for next iteration
         last_input_token = input_ids[chosen_index, num_generated - 1]
-        last_input_token = last_input_token.reshape(1, 1)
+        last_input_token = last_input_token.view(1, 1)
         inputs["input_ids"] = torch.cat([last_input_token, last_token], dim=1)
         inputs["attention_mask"] = attention_mask[:, :total_length]
 
