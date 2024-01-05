@@ -139,4 +139,8 @@ if __name__ == "__main__":
     # from gpu_profile import gpu_profile
 
     # sys.settrace(gpu_profile)
+
+    # torch.cuda.memory._record_memory_history()
     main()
+    # torch.cuda.memory._dump_snapshot("memory.pickle")
+    # torch.cuda.memory._record_memory_history(enabled=None)
